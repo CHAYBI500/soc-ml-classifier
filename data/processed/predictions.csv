@@ -1,0 +1,946 @@
+rule_id,rule_description,agent_name,confidence,prediction
+52002,Apparmor DENIED,WAZUH,0.1736,False Positive
+40704,Systemd: Service exited due to a failure.,WAZUH,0.8369,True Positive
+40704,Systemd: Service exited due to a failure.,WAZUH,0.8056,True Positive
+40704,Systemd: Service exited due to a failure.,WAZUH,0.7927,True Positive
+40704,Systemd: Service exited due to a failure.,WAZUH,0.7621,True Positive
+40704,Systemd: Service exited due to a failure.,WAZUH,0.7398,True Positive
+533,Listened ports status (netstat) changed (new port opened or closed).,WAZUH,0.7207,True Positive
+40704,Systemd: Service exited due to a failure.,WAZUH,0.7426,True Positive
+40704,Systemd: Service exited due to a failure.,WAZUH,0.7426,True Positive
+550,Integrity checksum changed.,Server_recovery,0.7497,True Positive
+60106,Windows Logon Success,Server_recovery,0.1919,False Positive
+61104,Service startup type was changed,Server_recovery,0.1736,False Positive
+61104,Service startup type was changed,Server_recovery,0.1523,False Positive
+60106,Windows Logon Success,Server_recovery,0.1783,False Positive
+60106,Windows Logon Success,Server_recovery,0.1698,False Positive
+60106,Windows Logon Success,Server_recovery,0.1747,False Positive
+60106,Windows Logon Success,Server_recovery,0.1736,False Positive
+60137,Windows User Logoff,Server_recovery,0.1736,False Positive
+40704,Systemd: Service exited due to a failure.,WAZUH,0.8518,True Positive
+60106,Windows Logon Success,Server_recovery,0.2009,False Positive
+60106,Windows Logon Success,Server_recovery,0.1757,False Positive
+40704,Systemd: Service exited due to a failure.,WAZUH,0.8208,True Positive
+60106,Windows Logon Success,Server_recovery,0.1888,False Positive
+533,Listened ports status (netstat) changed (new port opened or closed).,WAZUH,0.6883,True Positive
+60106,Windows Logon Success,Server_recovery,0.1755,False Positive
+61104,Service startup type was changed,Server_recovery,0.1951,False Positive
+61104,Service startup type was changed,Server_recovery,0.1741,False Positive
+533,Listened ports status (netstat) changed (new port opened or closed).,WAZUH,0.6456,True Positive
+67024,Service logon event registered from non standard service account.,Server_recovery,0.1873,False Positive
+67028,Special privileges assigned to new logon.,Server_recovery,0.1849,False Positive
+67023,Non service account logged off.,Server_recovery,0.1873,False Positive
+60106,Windows Logon Success,Server_recovery,0.1632,False Positive
+60106,Windows Logon Success,Server_recovery,0.1384,False Positive
+60106,Windows Logon Success,Server_recovery,0.1345,False Positive
+60106,Windows Logon Success,Server_recovery,0.1467,False Positive
+60137,Windows User Logoff,Server_recovery,0.1873,False Positive
+550,Integrity checksum changed.,WAZUH,0.6824,True Positive
+550,Integrity checksum changed.,WAZUH,0.6961,True Positive
+40704,Systemd: Service exited due to a failure.,WAZUH,0.8473,True Positive
+40704,Systemd: Service exited due to a failure.,WAZUH,0.8222,True Positive
+40704,Systemd: Service exited due to a failure.,WAZUH,0.8473,True Positive
+40704,Systemd: Service exited due to a failure.,WAZUH,0.8222,True Positive
+40704,Systemd: Service exited due to a failure.,WAZUH,0.7948,True Positive
+40704,Systemd: Service exited due to a failure.,WAZUH,0.7744,True Positive
+40704,Systemd: Service exited due to a failure.,WAZUH,0.7556,True Positive
+40704,Systemd: Service exited due to a failure.,WAZUH,0.7529,True Positive
+40704,Systemd: Service exited due to a failure.,WAZUH,0.8124,True Positive
+60106,Windows Logon Success,Server_recovery,0.1632,False Positive
+60106,Windows Logon Success,Server_recovery,0.1384,False Positive
+60106,Windows Logon Success,Server_recovery,0.1345,False Positive
+60106,Windows Logon Success,Server_recovery,0.1467,False Positive
+60642,Software protection service scheduled successfully.,Server_recovery,0.1873,False Positive
+533,Listened ports status (netstat) changed (new port opened or closed).,WAZUH,0.6863,True Positive
+60106,Windows Logon Success,Server_recovery,0.1632,False Positive
+60106,Windows Logon Success,Server_recovery,0.1384,False Positive
+60106,Windows Logon Success,Server_recovery,0.1345,False Positive
+60137,Windows User Logoff,Server_recovery,0.1873,False Positive
+60106,Windows Logon Success,Server_recovery,0.1248,False Positive
+533,Listened ports status (netstat) changed (new port opened or closed).,WAZUH,0.6506,True Positive
+60106,Windows Logon Success,Server_recovery,0.1467,False Positive
+60137,Windows User Logoff,Server_recovery,0.1799,False Positive
+40704,Systemd: Service exited due to a failure.,WAZUH,0.8473,True Positive
+40704,Systemd: Service exited due to a failure.,WAZUH,0.8222,True Positive
+40704,Systemd: Service exited due to a failure.,WAZUH,0.8473,True Positive
+60106,Windows Logon Success,Server_recovery,0.1632,False Positive
+60106,Windows Logon Success,Server_recovery,0.1384,False Positive
+40704,Systemd: Service exited due to a failure.,WAZUH,0.8222,True Positive
+60106,Windows Logon Success,Server_recovery,0.1345,False Positive
+40704,Systemd: Service exited due to a failure.,WAZUH,0.8473,True Positive
+40704,Systemd: Service exited due to a failure.,WAZUH,0.8222,True Positive
+40704,Systemd: Service exited due to a failure.,WAZUH,0.7948,True Positive
+40704,Systemd: Service exited due to a failure.,WAZUH,0.7723,True Positive
+40704,Systemd: Service exited due to a failure.,WAZUH,0.7577,True Positive
+67024,Service logon event registered from non standard service account.,Server_recovery,0.1873,False Positive
+67028,Special privileges assigned to new logon.,Server_recovery,0.1849,False Positive
+2904,Dpkg (Debian Package) half configured.,WAZUH,0.7236,True Positive
+2904,Dpkg (Debian Package) half configured.,WAZUH,0.6722,True Positive
+2904,Dpkg (Debian Package) half configured.,WAZUH,0.637,True Positive
+2904,Dpkg (Debian Package) half configured.,WAZUH,0.6169,True Positive
+2904,Dpkg (Debian Package) half configured.,WAZUH,0.6086,True Positive
+2904,Dpkg (Debian Package) half configured.,WAZUH,0.6086,True Positive
+2902,New dpkg (Debian Package) installed.,WAZUH,0.7236,True Positive
+2904,Dpkg (Debian Package) half configured.,WAZUH,0.6086,True Positive
+2904,Dpkg (Debian Package) half configured.,WAZUH,0.6084,True Positive
+2902,New dpkg (Debian Package) installed.,WAZUH,0.6722,True Positive
+2904,Dpkg (Debian Package) half configured.,WAZUH,0.6094,True Positive
+2904,Dpkg (Debian Package) half configured.,WAZUH,0.6084,True Positive
+2902,New dpkg (Debian Package) installed.,WAZUH,0.637,True Positive
+2904,Dpkg (Debian Package) half configured.,WAZUH,0.6051,True Positive
+2902,New dpkg (Debian Package) installed.,WAZUH,0.6169,True Positive
+2904,Dpkg (Debian Package) half configured.,WAZUH,0.6018,True Positive
+2902,New dpkg (Debian Package) installed.,WAZUH,0.6086,True Positive
+2902,New dpkg (Debian Package) installed.,WAZUH,0.6086,True Positive
+2904,Dpkg (Debian Package) half configured.,WAZUH,0.6018,True Positive
+2902,New dpkg (Debian Package) installed.,WAZUH,0.6086,True Positive
+2904,Dpkg (Debian Package) half configured.,WAZUH,0.5946,True Positive
+2904,Dpkg (Debian Package) half configured.,WAZUH,0.6013,True Positive
+2902,New dpkg (Debian Package) installed.,WAZUH,0.6094,True Positive
+67023,Non service account logged off.,Server_recovery,0.1873,False Positive
+533,Listened ports status (netstat) changed (new port opened or closed).,WAZUH,0.6863,True Positive
+60106,Windows Logon Success,Server_recovery,0.1632,False Positive
+60137,Windows User Logoff,Server_recovery,0.1873,False Positive
+60106,Windows Logon Success,Server_recovery,0.1525,False Positive
+60106,Windows Logon Success,Server_recovery,0.1343,False Positive
+60106,Windows Logon Success,Server_recovery,0.1328,False Positive
+40704,Systemd: Service exited due to a failure.,WAZUH,0.8269,True Positive
+40704,Systemd: Service exited due to a failure.,WAZUH,0.8124,True Positive
+533,Listened ports status (netstat) changed (new port opened or closed).,WAZUH,0.6863,True Positive
+533,Listened ports status (netstat) changed (new port opened or closed).,WAZUH,0.6506,True Positive
+60106,Windows Logon Success,Server_recovery,0.1632,False Positive
+60106,Windows Logon Success,Server_recovery,0.1384,False Positive
+60106,Windows Logon Success,Server_recovery,0.1345,False Positive
+40704,Systemd: Service exited due to a failure.,WAZUH,0.8473,True Positive
+87104,VirusTotal: Alert - /home/wazuh/snap/firmware-updater/226/.config/ibus/bus - No positives found,WAZUH,0.1873,False Positive
+40704,Systemd: Service exited due to a failure.,WAZUH,0.8222,True Positive
+87104,VirusTotal: Alert - /home/wazuh/snap/firmware-updater/226/.config/ibus/bus - No positives found,WAZUH,0.1722,False Positive
+60106,Windows Logon Success,Server_recovery,0.1467,False Positive
+60137,Windows User Logoff,Server_recovery,0.1873,False Positive
+40704,Systemd: Service exited due to a failure.,WAZUH,0.8473,True Positive
+40704,Systemd: Service exited due to a failure.,WAZUH,0.8222,True Positive
+60106,Windows Logon Success,Server_recovery,0.1632,False Positive
+60106,Windows Logon Success,Server_recovery,0.1384,False Positive
+60106,Windows Logon Success,Server_recovery,0.1345,False Positive
+61109,Name resolution for the name _ldap._tcp.Premier-Site-par-defaut._sites.dc._msdcs.douja.local. timed out,windows-dev,0.8473,True Positive
+550,Integrity checksum changed.,windows-dev,0.7229,True Positive
+550,Integrity checksum changed.,windows-dev,0.6582,True Positive
+550,Integrity checksum changed.,windows-dev,0.6125,True Positive
+550,Integrity checksum changed.,windows-dev,0.6038,True Positive
+550,Integrity checksum changed.,windows-dev,0.5921,True Positive
+550,Integrity checksum changed.,windows-dev,0.5921,True Positive
+550,Integrity checksum changed.,windows-dev,0.5921,True Positive
+550,Integrity checksum changed.,windows-dev,0.5897,True Positive
+550,Integrity checksum changed.,windows-dev,0.5887,True Positive
+550,Integrity checksum changed.,windows-dev,0.5887,True Positive
+752,Registry Value Entry Added to the System,windows-dev,0.6421,True Positive
+598,Registry Key Entry Added to the System,windows-dev,0.6729,True Positive
+598,Registry Key Entry Added to the System,windows-dev,0.6082,True Positive
+752,Registry Value Entry Added to the System,windows-dev,0.5853,True Positive
+598,Registry Key Entry Added to the System,windows-dev,0.5659,True Positive
+752,Registry Value Entry Added to the System,windows-dev,0.5527,True Positive
+598,Registry Key Entry Added to the System,windows-dev,0.5604,True Positive
+752,Registry Value Entry Added to the System,windows-dev,0.5473,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.6906,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.6331,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5884,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5772,True Positive
+752,Registry Value Entry Added to the System,windows-dev,0.5355,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5705,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.6647,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.6151,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5705,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5779,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5705,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5653,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5586,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5586,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5586,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5563,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5553,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5553,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.552,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5486,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5486,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5482,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5448,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.542,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.542,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.542,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.542,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.542,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.542,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.542,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.542,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.542,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.542,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.542,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5386,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5345,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5312,True Positive
+752,Registry Value Entry Added to the System,windows-dev,0.5355,True Positive
+752,Registry Value Entry Added to the System,windows-dev,0.5355,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5682,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5672,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5672,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5639,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5606,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+752,Registry Value Entry Added to the System,windows-dev,0.5332,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5606,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5601,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5568,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5539,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5539,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5539,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5539,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5539,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5539,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5539,True Positive
+752,Registry Value Entry Added to the System,windows-dev,0.5322,True Positive
+752,Registry Value Entry Added to the System,windows-dev,0.5322,True Positive
+752,Registry Value Entry Added to the System,windows-dev,0.5289,True Positive
+752,Registry Value Entry Added to the System,windows-dev,0.5256,True Positive
+752,Registry Value Entry Added to the System,windows-dev,0.5256,True Positive
+752,Registry Value Entry Added to the System,windows-dev,0.5251,True Positive
+752,Registry Value Entry Added to the System,windows-dev,0.5218,True Positive
+752,Registry Value Entry Added to the System,windows-dev,0.5189,True Positive
+752,Registry Value Entry Added to the System,windows-dev,0.5189,True Positive
+752,Registry Value Entry Added to the System,windows-dev,0.5189,True Positive
+752,Registry Value Entry Added to the System,windows-dev,0.5189,True Positive
+752,Registry Value Entry Added to the System,windows-dev,0.5189,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5539,True Positive
+752,Registry Value Entry Added to the System,windows-dev,0.5189,True Positive
+752,Registry Value Entry Added to the System,windows-dev,0.5189,True Positive
+752,Registry Value Entry Added to the System,windows-dev,0.5189,True Positive
+752,Registry Value Entry Added to the System,windows-dev,0.5189,True Positive
+752,Registry Value Entry Added to the System,windows-dev,0.5189,True Positive
+752,Registry Value Entry Added to the System,windows-dev,0.5189,True Positive
+752,Registry Value Entry Added to the System,windows-dev,0.5122,True Positive
+752,Registry Value Entry Added to the System,windows-dev,0.5066,True Positive
+752,Registry Value Entry Added to the System,windows-dev,0.5033,True Positive
+752,Registry Value Entry Added to the System,windows-dev,0.499,False Positive
+752,Registry Value Entry Added to the System,windows-dev,0.499,False Positive
+752,Registry Value Entry Added to the System,windows-dev,0.499,False Positive
+752,Registry Value Entry Added to the System,windows-dev,0.499,False Positive
+752,Registry Value Entry Added to the System,windows-dev,0.499,False Positive
+752,Registry Value Entry Added to the System,windows-dev,0.499,False Positive
+752,Registry Value Entry Added to the System,windows-dev,0.499,False Positive
+752,Registry Value Entry Added to the System,windows-dev,0.499,False Positive
+752,Registry Value Entry Added to the System,windows-dev,0.499,False Positive
+752,Registry Value Entry Added to the System,windows-dev,0.499,False Positive
+752,Registry Value Entry Added to the System,windows-dev,0.499,False Positive
+752,Registry Value Entry Added to the System,windows-dev,0.499,False Positive
+752,Registry Value Entry Added to the System,windows-dev,0.499,False Positive
+752,Registry Value Entry Added to the System,windows-dev,0.499,False Positive
+752,Registry Value Entry Added to the System,windows-dev,0.499,False Positive
+752,Registry Value Entry Added to the System,windows-dev,0.499,False Positive
+752,Registry Value Entry Added to the System,windows-dev,0.499,False Positive
+752,Registry Value Entry Added to the System,windows-dev,0.499,False Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5539,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5539,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5539,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5506,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5464,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5431,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5388,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5388,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5388,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5388,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5388,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5388,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5388,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5269,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5286,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5286,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5235,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5235,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5235,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5235,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5388,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5235,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5235,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5235,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5235,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5235,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5235,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5235,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5235,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5235,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5235,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5235,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5235,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5235,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5235,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5235,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5235,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5235,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5235,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5235,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5235,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5235,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5235,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5235,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5388,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5235,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5235,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5235,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5235,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5235,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5235,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5235,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5235,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5235,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5235,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5202,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5202,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5202,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5169,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5388,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5135,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5388,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5388,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5388,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5388,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5388,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5388,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5388,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5388,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5388,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5388,True Positive
+752,Registry Value Entry Added to the System,windows-dev,0.499,False Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5388,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5388,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5388,True Positive
+598,Registry Key Entry Added to the System,windows-dev,0.5487,True Positive
+598,Registry Key Entry Added to the System,windows-dev,0.5487,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5388,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5388,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5388,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5388,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+594,Registry Key Integrity Checksum Changed,windows-dev,0.5388,True Positive
+750,Registry Value Integrity Checksum Changed,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.6647,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.6151,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5779,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5653,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5586,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5586,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5563,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5586,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5553,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5553,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.552,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5486,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5486,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5482,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5448,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.542,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.542,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.542,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.542,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.542,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.542,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.542,True Positive
+67008,Windows Firewall With Advanced Security: {1E91A73E-D014-4072-8775-754966A60415} rule has been deleted in the Windows Defender Firewall exception list.,windows-dev,0.8673,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.542,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.542,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.542,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.542,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5386,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5345,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5312,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5269,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5286,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5286,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5235,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5235,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5235,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5235,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5235,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5235,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5235,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5235,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5235,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5235,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5235,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5235,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5235,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5235,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5235,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5235,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5235,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5235,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5235,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5235,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5235,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5235,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5235,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5235,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5235,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5235,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5235,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5235,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5235,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5235,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5235,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5235,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5235,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5235,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5235,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5235,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5235,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5202,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5202,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5202,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5169,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5135,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+751,Registry Value Entry Deleted.,windows-dev,0.5069,True Positive
+597,Registry Key Entry Deleted.,windows-dev,0.6906,True Positive
+597,Registry Key Entry Deleted.,windows-dev,0.6331,True Positive
+597,Registry Key Entry Deleted.,windows-dev,0.5884,True Positive
+597,Registry Key Entry Deleted.,windows-dev,0.5772,True Positive
+597,Registry Key Entry Deleted.,windows-dev,0.5705,True Positive
+597,Registry Key Entry Deleted.,windows-dev,0.5705,True Positive
+597,Registry Key Entry Deleted.,windows-dev,0.5705,True Positive
+597,Registry Key Entry Deleted.,windows-dev,0.5682,True Positive
+597,Registry Key Entry Deleted.,windows-dev,0.5672,True Positive
+597,Registry Key Entry Deleted.,windows-dev,0.5672,True Positive
+597,Registry Key Entry Deleted.,windows-dev,0.5639,True Positive
+597,Registry Key Entry Deleted.,windows-dev,0.5606,True Positive
+597,Registry Key Entry Deleted.,windows-dev,0.5606,True Positive
+597,Registry Key Entry Deleted.,windows-dev,0.5601,True Positive
+597,Registry Key Entry Deleted.,windows-dev,0.5568,True Positive
+597,Registry Key Entry Deleted.,windows-dev,0.5539,True Positive
+597,Registry Key Entry Deleted.,windows-dev,0.5539,True Positive
+597,Registry Key Entry Deleted.,windows-dev,0.5539,True Positive
+597,Registry Key Entry Deleted.,windows-dev,0.5539,True Positive
+597,Registry Key Entry Deleted.,windows-dev,0.5539,True Positive
+597,Registry Key Entry Deleted.,windows-dev,0.5539,True Positive
+597,Registry Key Entry Deleted.,windows-dev,0.5539,True Positive
+597,Registry Key Entry Deleted.,windows-dev,0.5539,True Positive
+597,Registry Key Entry Deleted.,windows-dev,0.5539,True Positive
+597,Registry Key Entry Deleted.,windows-dev,0.5539,True Positive
+597,Registry Key Entry Deleted.,windows-dev,0.5539,True Positive
+597,Registry Key Entry Deleted.,windows-dev,0.5506,True Positive
+597,Registry Key Entry Deleted.,windows-dev,0.5464,True Positive
+597,Registry Key Entry Deleted.,windows-dev,0.5431,True Positive
+597,Registry Key Entry Deleted.,windows-dev,0.5388,True Positive
+597,Registry Key Entry Deleted.,windows-dev,0.5388,True Positive
+597,Registry Key Entry Deleted.,windows-dev,0.5388,True Positive
+597,Registry Key Entry Deleted.,windows-dev,0.5388,True Positive
+597,Registry Key Entry Deleted.,windows-dev,0.5388,True Positive
+597,Registry Key Entry Deleted.,windows-dev,0.5388,True Positive
+597,Registry Key Entry Deleted.,windows-dev,0.5388,True Positive
+597,Registry Key Entry Deleted.,windows-dev,0.5388,True Positive
+597,Registry Key Entry Deleted.,windows-dev,0.5388,True Positive
+597,Registry Key Entry Deleted.,windows-dev,0.5388,True Positive
+597,Registry Key Entry Deleted.,windows-dev,0.5388,True Positive
+597,Registry Key Entry Deleted.,windows-dev,0.5388,True Positive
+597,Registry Key Entry Deleted.,windows-dev,0.5388,True Positive
+597,Registry Key Entry Deleted.,windows-dev,0.5388,True Positive
+597,Registry Key Entry Deleted.,windows-dev,0.5388,True Positive
+597,Registry Key Entry Deleted.,windows-dev,0.5388,True Positive
+597,Registry Key Entry Deleted.,windows-dev,0.5388,True Positive
+597,Registry Key Entry Deleted.,windows-dev,0.5388,True Positive
+597,Registry Key Entry Deleted.,windows-dev,0.5388,True Positive
+60602,Windows application error event.,windows-dev,0.8673,True Positive
+67008,Windows Firewall With Advanced Security: {916DA7C6-6E8E-40C4-B272-96B4FCCCF30C} rule has been deleted in the Windows Defender Firewall exception list.,windows-dev,0.8422,True Positive
+67008,Windows Firewall With Advanced Security: {77D5E0BB-9F78-4BC6-BB97-3AF9F7CFC191} rule has been deleted in the Windows Defender Firewall exception list.,windows-dev,0.8202,True Positive
+60642,Software protection service scheduled successfully.,windows-dev,0.1873,False Positive
+67008,Windows Firewall With Advanced Security: {03F308B6-85E6-431E-B450-12112F82323E} rule has been deleted in the Windows Defender Firewall exception list.,windows-dev,0.7857,True Positive
+67008,Windows Firewall With Advanced Security: {77CAEE33-2AA5-426D-9C8F-60130BA61ABE} rule has been deleted in the Windows Defender Firewall exception list.,windows-dev,0.7723,True Positive
+92654,WMI query for System Information Discovery.,windows-dev,0.8382,True Positive
+60642,Software protection service scheduled successfully.,windows-dev,0.1722,False Positive
+60602,Windows application error event.,windows-dev,0.8422,True Positive
+60636,Windows installer installed an update.,windows-dev,0.1873,False Positive
+60612,"Application installed SQL Server 2016 Database Engine Services, 13.0.1601.5, 1033, 1642, Microsoft Corporation.",windows-dev,0.1873,False Positive
+60626,Update installed successfully.,windows-dev,0.1873,False Positive
+60636,Windows installer installed an update.,windows-dev,0.1722,False Positive
+60635,Windows installer reconfigured the product.,windows-dev,0.1873,False Positive
+60626,Update installed successfully.,windows-dev,0.1722,False Positive
+60636,Windows installer installed an update.,windows-dev,0.1635,False Positive
+60635,Windows installer reconfigured the product.,windows-dev,0.1722,False Positive
+60626,Update installed successfully.,windows-dev,0.1635,False Positive
+60636,Windows installer installed an update.,windows-dev,0.1457,False Positive
+60635,Windows installer reconfigured the product.,windows-dev,0.1635,False Positive
+60626,Update installed successfully.,windows-dev,0.1457,False Positive
+60636,Windows installer installed an update.,windows-dev,0.1356,False Positive
+60635,Windows installer reconfigured the product.,windows-dev,0.1457,False Positive
+60626,Update installed successfully.,windows-dev,0.1356,False Positive
+60636,Windows installer installed an update.,windows-dev,0.1329,False Positive
+60635,Windows installer reconfigured the product.,windows-dev,0.1356,False Positive
+60626,Update installed successfully.,windows-dev,0.1329,False Positive
+60636,Windows installer installed an update.,windows-dev,0.1329,False Positive
+60635,Windows installer reconfigured the product.,windows-dev,0.1329,False Positive
+60626,Update installed successfully.,windows-dev,0.1329,False Positive
+60636,Windows installer installed an update.,windows-dev,0.1338,False Positive
+60635,Windows installer reconfigured the product.,windows-dev,0.1329,False Positive
+60610,Windows installer began an installation process.,windows-dev,0.1873,False Positive
+60612,Application installed Product: Microsoft SQL Server 2016 Setup (English) -- Installation completed successfully..,windows-dev,0.1722,False Positive
+60612,"Application installed Microsoft SQL Server 2016 Setup (English), 13.3.7095.1, 1033, 0, Microsoft Corporation.",windows-dev,0.1635,False Positive
+60610,Windows installer began an installation process.,windows-dev,0.1722,False Positive
+60611,Application uninstalled Product: SQL Server 2016 SQL Data Quality Common -- Install started..,windows-dev,0.1873,False Positive
+60626,Update installed successfully.,windows-dev,0.1338,False Positive
+60635,Windows installer reconfigured the product.,windows-dev,0.1338,False Positive
+60636,Windows installer installed an update.,windows-dev,0.1325,False Positive
+60610,Windows installer began an installation process.,windows-dev,0.1635,False Positive
+60611,Application uninstalled Product: SQL Server 2016 Client Tools Extensions -- Install started..,windows-dev,0.1722,False Positive
+60626,Update installed successfully.,windows-dev,0.1325,False Positive
+60636,Windows installer installed an update.,windows-dev,0.1369,False Positive
+60635,Windows installer reconfigured the product.,windows-dev,0.1325,False Positive
+60610,Windows installer began an installation process.,windows-dev,0.1457,False Positive
+60612,Application installed Product: Microsoft ODBC Driver 13 for SQL Server -- Installation completed successfully..,windows-dev,0.1457,False Positive
+60612,"Application installed Microsoft ODBC Driver 13 for SQL Server, 13.3.7095.1, 1033, 0, Microsoft Corporation.",windows-dev,0.1356,False Positive
+60610,Windows installer began an installation process.,windows-dev,0.1356,False Positive
+60626,Update installed successfully.,windows-dev,0.1369,False Positive
+60636,Windows installer installed an update.,windows-dev,0.1416,False Positive
+60635,Windows installer reconfigured the product.,windows-dev,0.1369,False Positive
+60610,Windows installer began an installation process.,windows-dev,0.1329,False Positive
+60626,Update installed successfully.,windows-dev,0.1416,False Positive
+60636,Windows installer installed an update.,windows-dev,0.145,False Positive
+60635,Windows installer reconfigured the product.,windows-dev,0.1416,False Positive
+60610,Windows installer began an installation process.,windows-dev,0.1329,False Positive
+60611,Application uninstalled Product: SQL Server 2016 Common Files -- Install started..,windows-dev,0.1635,False Positive
+60626,Update installed successfully.,windows-dev,0.145,False Positive
+60636,Windows installer installed an update.,windows-dev,0.155,False Positive
+60635,Windows installer reconfigured the product.,windows-dev,0.145,False Positive
+60610,Windows installer began an installation process.,windows-dev,0.1338,False Positive
+60611,Application uninstalled Product: SQL Server 2016 Distributed Replay -- Install started..,windows-dev,0.1457,False Positive
+60626,Update installed successfully.,windows-dev,0.155,False Positive
+60636,Windows installer installed an update.,windows-dev,0.1578,False Positive
+60635,Windows installer reconfigured the product.,windows-dev,0.155,False Positive
+60610,Windows installer began an installation process.,windows-dev,0.1325,False Positive
+92654,WMI query for System Information Discovery.,windows-dev,0.8147,True Positive
+60612,Application installed Product: Microsoft SQL Server 2016 RsFx Driver -- Installation completed successfully..,windows-dev,0.1329,False Positive
+60612,"Application installed Microsoft SQL Server 2016 RsFx Driver, 13.3.7095.1, 1033, 0, Microsoft Corporation.",windows-dev,0.1329,False Positive
+60610,Windows installer began an installation process.,windows-dev,0.1369,False Positive
+60611,Application uninstalled Product: SQL Server 2016 Database Engine Shared -- Install started..,windows-dev,0.1356,False Positive
+60636,Windows installer installed an update.,windows-dev,0.1545,False Positive
+60626,Update installed successfully.,windows-dev,0.1578,False Positive
+60635,Windows installer reconfigured the product.,windows-dev,0.1578,False Positive
+60610,Windows installer began an installation process.,windows-dev,0.1416,False Positive
+60611,Application uninstalled Product: SQL Server 2016 Database Engine Services -- Install started..,windows-dev,0.1329,False Positive
+60626,Update installed successfully.,windows-dev,0.1545,False Positive
+60636,Windows installer installed an update.,windows-dev,0.1516,False Positive
+60635,Windows installer reconfigured the product.,windows-dev,0.1545,False Positive
+60602,Windows application error event.,windows-dev,0.8372,True Positive
+61060,The open procedure for service remote access failed.,windows-dev,0.8473,True Positive
+92654,WMI query for System Information Discovery.,windows-dev,0.7997,True Positive
+60642,Software protection service scheduled successfully.,windows-dev,0.1783,False Positive
+60106,Windows Logon Success,Server_recovery,0.1632,False Positive
+40704,Systemd: Service exited due to a failure.,WAZUH,0.8473,True Positive
+40704,Systemd: Service exited due to a failure.,WAZUH,0.8222,True Positive
+40704,Systemd: Service exited due to a failure.,WAZUH,0.8002,True Positive
+40704,Systemd: Service exited due to a failure.,WAZUH,0.769,True Positive
+40704,Systemd: Service exited due to a failure.,WAZUH,0.7556,True Positive
+60106,Windows Logon Success,Server_recovery,0.1384,False Positive
+60106,Windows Logon Success,Server_recovery,0.1345,False Positive
+60642,Software protection service scheduled successfully.,Server_recovery,0.1785,False Positive
+60642,Software protection service scheduled successfully.,windows-dev,0.1652,False Positive
+67008,Windows Firewall With Advanced Security: {5A28B1D0-474C-4F70-BC5C-7994CC45972B} rule has been deleted in the Windows Defender Firewall exception list.,windows-dev,0.8673,True Positive
+67008,Windows Firewall With Advanced Security: {3C62A1DE-FAA4-450C-8137-9E1AC332169C} rule has been deleted in the Windows Defender Firewall exception list.,windows-dev,0.8422,True Positive
+67008,Windows Firewall With Advanced Security: {D34A618E-F38B-4F9A-B21C-1C7C27D2B554} rule has been deleted in the Windows Defender Firewall exception list.,windows-dev,0.8202,True Positive
+67008,Windows Firewall With Advanced Security: {2D7E3793-9E8B-485F-B829-9B57876484C7} rule has been deleted in the Windows Defender Firewall exception list.,windows-dev,0.7857,True Positive
+92654,WMI query for System Information Discovery.,windows-dev,0.8382,True Positive
+60642,Software protection service scheduled successfully.,windows-dev,0.1783,False Positive
+92654,WMI query for System Information Discovery.,windows-dev,0.8147,True Positive
+92654,WMI query for System Information Discovery.,windows-dev,0.7997,True Positive
+550,Integrity checksum changed.,Server_recovery,0.7229,True Positive
+550,Integrity checksum changed.,Server_recovery,0.6582,True Positive
+550,Integrity checksum changed.,Server_recovery,0.6125,True Positive
+550,Integrity checksum changed.,Server_recovery,0.6038,True Positive
+594,Registry Key Integrity Checksum Changed,Server_recovery,0.6906,True Positive
+594,Registry Key Integrity Checksum Changed,Server_recovery,0.6331,True Positive
+750,Registry Value Integrity Checksum Changed,Server_recovery,0.6647,True Positive
+594,Registry Key Integrity Checksum Changed,Server_recovery,0.5884,True Positive
+750,Registry Value Integrity Checksum Changed,Server_recovery,0.6151,True Positive
+40704,Systemd: Service exited due to a failure.,WAZUH,0.8269,True Positive
+594,Registry Key Integrity Checksum Changed,Server_recovery,0.5772,True Positive
+750,Registry Value Integrity Checksum Changed,Server_recovery,0.5779,True Positive
+594,Registry Key Integrity Checksum Changed,Server_recovery,0.5705,True Positive
+750,Registry Value Integrity Checksum Changed,Server_recovery,0.5653,True Positive
+750,Registry Value Integrity Checksum Changed,Server_recovery,0.5586,True Positive
+594,Registry Key Integrity Checksum Changed,Server_recovery,0.5705,True Positive
+750,Registry Value Integrity Checksum Changed,Server_recovery,0.5586,True Positive
+750,Registry Value Integrity Checksum Changed,Server_recovery,0.5586,True Positive
+594,Registry Key Integrity Checksum Changed,Server_recovery,0.5705,True Positive
+750,Registry Value Integrity Checksum Changed,Server_recovery,0.5563,True Positive
+40704,Systemd: Service exited due to a failure.,WAZUH,0.8124,True Positive
+60642,Software protection service scheduled successfully.,windows-dev,0.1729,False Positive
+5715,sshd: authentication success.,WAZUH,0.1372,False Positive
+5501,PAM: Login session opened.,WAZUH,0.0972,False Positive
+5501,PAM: Login session opened.,WAZUH,0.0651,False Positive

@@ -1,0 +1,13 @@
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+python-multipart==0.0.20
+scikit-learn==1.6.0
+pandas==2.2.3
+numpy==2.2.1
+joblib==1.4.2
+requests==2.32.3
+pydantic==2.10.4
+datasets==3.2.0
+python-dotenv==1.2.2
+pyodbc==5.3.0
+google-genai==2.14.0

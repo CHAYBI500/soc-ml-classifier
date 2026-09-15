@@ -1,0 +1,42 @@
+#!/bin/sh
+# custom-ml-triage
+# ==================
+# Wrapper shell appelé par integrator (Wazuh) pour l'intégration custom-ml-triage.
+# Cohérent avec le style de /var/ossec/integrations/custom-abuseipdb déjà en place.
+#
+# Wazuh invoque ce script avec les arguments suivants (voir intégrations natives) :
+#   $1 : chemin du fichier contenant l'alerte JSON (une alerte unique)
+#   $2 : identifiant de la clé/hook (ignoré ici, pas de clé API externe requise)
+#   $3 : chemin du fichier de configuration additionnel (optionnel, ignoré)
+#
+# Ce wrapper se contente de déléguer au script Python custom-ml-triage.py,
+# à l'identique du fonctionnement de custom-abuseipdb / custom-abuseipdb.py.
+
+WPYTHON_BIN="framework/python/bin/python3"
+
+SCRIPT_PATH_NAME="$0"
+DIR_NAME=$(cd $(dirname "${SCRIPT_PATH_NAME}"); pwd)
+SCRIPT_NAME="$(basename "${SCRIPT_PATH_NAME}")"
+
+case ${DIR_NAME} in
+    */active-response/bin | */wodles*)
+        if [ -z "${WAZUH_PATH}" ]; then
+            WAZUH_PATH=$(cd ${DIR_NAME}/../..; pwd)
+        fi
+        PYTHON_SCRIPT="${DIR_NAME}/${SCRIPT_NAME}.py"
+        ;;
+    */bin)
+        if [ -z "${WAZUH_PATH}" ]; then
+            WAZUH_PATH=$(cd ${DIR_NAME}/..; pwd)
+        fi
+        PYTHON_SCRIPT="${DIR_NAME}/../integrations/${SCRIPT_NAME}.py"
+        ;;
+    */integrations)
+        if [ -z "${WAZUH_PATH}" ]; then
+            WAZUH_PATH=$(cd ${DIR_NAME}/..; pwd)
+        fi
+        PYTHON_SCRIPT="${DIR_NAME}/${SCRIPT_NAME}.py"
+        ;;
+esac
+
+${WAZUH_PATH}/${WPYTHON_BIN} ${PYTHON_SCRIPT} "$@"

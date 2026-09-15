@@ -1,0 +1,3504 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOC ML Triage — Console</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0a0f14;
+    --panel: #10171f;
+    --panel-2: #141d27;
+    --line: #223041;
+    --line-soft: #1a2530;
+    --text: #dce6ef;
+    --text-dim: #7c93a8;
+    --tp: #ff5d5f;
+    --tp-dim: #4a2226;
+    --fp: #3a4756;
+    --fp-text: #93a6b8;
+    --ok: #35d68f;
+    --warn: #f0b03c;
+    --accent: #4fb8ff;
+    --ai: #a684ff;
+    --ai-dim: #2a2140;
+    --sql: #ff2f92;
+    --sql-dim: #401027;
+    --vuln: #22d3ee;
+    --vuln-dim: #0c2f36;
+    --radius: 6px;
+    --radius-lg: 12px;
+    --mono: 'IBM Plex Mono', monospace;
+    --display: 'Space Grotesk', sans-serif;
+    /* ---- élévation (perceptible sur fond quasi noir via une lueur douce plutôt qu'une
+       ombre portée classique, qui se voit mal sur un thème sombre) ---- */
+    --shadow-sm: 0 1px 2px rgba(0,0,0,.4);
+    --shadow-md: 0 8px 24px rgba(0,0,0,.45), 0 1px 0 rgba(255,255,255,.03) inset;
+    --shadow-lg: 0 20px 60px rgba(0,0,0,.55), 0 1px 0 rgba(255,255,255,.04) inset;
+    --shadow-glow-accent: 0 0 0 1px rgba(79,184,255,.25), 0 8px 28px rgba(79,184,255,.12);
+    /* ---- espacement (utilisé par les composants ajoutés : palette de commandes, toasts,
+       squelettes de chargement — les panneaux existants gardent leurs valeurs actuelles) ---- */
+    --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 24px; --sp-6: 32px;
+    /* ---- mouvement ---- */
+    --ease-out: cubic-bezier(.16,1,.3,1);
+    --ease-spring: cubic-bezier(.34,1.56,.64,1);
+    --dur-fast: .14s;
+    --dur-base: .22s;
+  }
+  [data-theme="light"]{
+    --bg: #eef2f5;
+    --panel: #ffffff;
+    --panel-2: #f5f7f9;
+    --line: #d7dee4;
+    --line-soft: #e4e9ed;
+    --text: #16232e;
+    --text-dim: #5c7182;
+    --tp: #d6373a;
+    --tp-dim: #fce4e4;
+    --fp: #c3ced7;
+    --fp-text: #4d5f6f;
+    --ok: #159a63;
+    --warn: #b57713;
+    --accent: #1b7cc4;
+    --ai: #7440d8;
+    --ai-dim: #ece3ff;
+    --sql: #c81877;
+    --sql-dim: #fbdcec;
+    --vuln: #0899b0;
+    --vuln-dim: #dcf3f6;
+    --shadow-sm: 0 1px 2px rgba(22,35,46,.06);
+    --shadow-md: 0 8px 24px rgba(22,35,46,.10), 0 1px 0 rgba(255,255,255,.6) inset;
+    --shadow-lg: 0 20px 50px rgba(22,35,46,.16), 0 1px 0 rgba(255,255,255,.7) inset;
+    --shadow-glow-accent: 0 0 0 1px rgba(27,124,196,.18), 0 8px 24px rgba(27,124,196,.10);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:var(--mono); font-size:14px;
+    transition:background .2s ease, color .2s ease;
+  }
+  a{color:inherit;}
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important;}
+  }
+
+  /* ---------- header ---------- */
+  header{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 22px; border-bottom:1px solid var(--line);
+    background:var(--panel);
+    position:sticky; top:0; z-index:10;
+    flex-wrap:wrap; gap:10px;
+  }
+  .brand{display:flex; align-items:center; gap:12px;}
+  .brand .mark{
+    width:30px; height:30px; border-radius:8px;
+    background:linear-gradient(135deg, var(--accent), var(--ok));
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--display); font-weight:700; color:#06121a; font-size:13px;
+  }
+  .brand h1{font-family:var(--display); font-size:16px; margin:0; letter-spacing:.2px;}
+  .brand .sub{font-size:11px; color:var(--text-dim); margin-top:1px;}
+
+  .header-right{display:flex; align-items:center; gap:12px; flex-wrap:wrap;}
+  .status-pill{
+    display:flex; align-items:center; gap:7px;
+    font-size:12px; padding:6px 12px; border-radius:99px;
+    border:1px solid var(--line); background:var(--panel-2);
+    transition:border-color var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out);
+  }
+  .push-pill svg{width:12px; height:12px;}
+  .push-pill{color:var(--text-dim);}
+  .push-pill.state-live{border-color:var(--ok); color:var(--ok);}
+  .push-pill.state-live svg{animation:zap-pulse 1.8s ease-in-out infinite;}
+  .push-pill.state-fallback{border-color:var(--warn); color:var(--warn);}
+  @keyframes zap-pulse{0%,100%{opacity:1;} 50%{opacity:.45;}}
+  .dot{width:8px; height:8px; border-radius:50%; background:var(--text-dim); position:relative;}
+  .dot.online{background:var(--ok); box-shadow:0 0 0 0 rgba(53,214,143,.6); animation:pulse 2s infinite;}
+  .dot.offline{background:var(--tp);}
+  @keyframes pulse{
+    0%{box-shadow:0 0 0 0 rgba(53,214,143,.55);}
+    70%{box-shadow:0 0 0 8px rgba(53,214,143,0);}
+    100%{box-shadow:0 0 0 0 rgba(53,214,143,0);}
+  }
+
+  .tabs{display:flex; gap:4px; background:var(--panel-2); padding:3px; border-radius:8px; border:1px solid var(--line);}
+  .tab-btn{
+    border:none; background:transparent; color:var(--text-dim); font-family:var(--mono);
+    font-size:12px; padding:7px 14px; border-radius:6px; cursor:pointer;
+  }
+  .tab-btn.active{background:var(--accent); color:#06121a; font-weight:600;}
+
+  .icon-btn{
+    border:1px solid var(--line); background:var(--panel-2); color:var(--text);
+    width:34px; height:34px; border-radius:8px; cursor:pointer; font-size:15px;
+    display:flex; align-items:center; justify-content:center; position:relative;
+    transition:border-color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
+  }
+  .icon-btn:hover{border-color:var(--accent); transform:translateY(-1px);}
+  .icon-btn:active{transform:translateY(0);}
+  .icon-btn svg{width:16px; height:16px; display:block;}
+  .icon-btn.ai-btn{border-color:var(--ai); color:var(--ai);}
+  .icon-btn.ai-btn:hover{background:var(--ai-dim);}
+  .btn-icon{display:inline-flex; vertical-align:-3px;}
+  .btn-icon svg{width:14px; height:14px; display:block;}
+  .ai-avatar svg{width:16px; height:16px; display:block; color:#fff;}
+
+  main{padding:22px; max-width:1320px; margin:0 auto;}
+  .view{display:none;}
+  .view.active{display:block; animation:view-in var(--dur-base) var(--ease-out);}
+  @keyframes view-in{
+    from{opacity:0; transform:translateY(6px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+
+  /* ---------- counters ---------- */
+  /* Rangée compacte à une seule ligne (flex + overflow-x) plutôt qu'une grille qui repasse
+     à plusieurs lignes sur écran étroit : l'utilisateur veut garder tous les compteurs
+     visibles d'un coup d'œil sans que la mosaïque ne s'étale verticalement — au pire on
+     scrolle horizontalement plutôt que de wrapper. Tuiles réduites (padding/police) en
+     conséquence pour que 8 tuiles tiennent confortablement sur un écran de bureau. */
+  .counters{
+    display:flex; gap:8px; margin-bottom:16px;
+    overflow-x:auto; padding-bottom:3px;
+  }
+  .counter{
+    background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
+    padding:8px 12px; position:relative; overflow:hidden; box-shadow:var(--shadow-sm);
+    flex:1 1 0; min-width:104px; white-space:nowrap;
+    transition:transform var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out);
+  }
+  .counter:hover{transform:translateY(-2px); box-shadow:var(--shadow-md); border-color:var(--line-soft);}
+  .counter-clickable{cursor:pointer;}
+  .counter-clickable:hover{border-color:var(--accent); box-shadow:var(--shadow-glow-accent);}
+  .counter-clickable:active{transform:translateY(0);}
+
+  /* ---------- éléments cliquables dans les mini-widgets (agents/règles/sévérité/catégories) ---------- */
+  .clickable-row{cursor:pointer; border-radius:6px; transition:background .12s ease;}
+  .clickable-row:hover{background:var(--panel-2);}
+  .clickable-row:hover .name{color:var(--text);}
+  .clickable-row.selected{background:var(--panel-2); box-shadow:inset 2px 0 0 var(--accent);}
+  .counter .label{font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:.5px; overflow:hidden; text-overflow:ellipsis;}
+  .counter .value{font-family:var(--display); font-size:18px; font-weight:700; margin-top:3px;}
+  .counter.tp .value{color:var(--tp);}
+  .counter.fp .value{color:var(--fp-text);}
+  .counter.rate .value{color:var(--ok);}
+  .counter.conf .value{color:var(--accent);}
+  .counter::after{
+    content:""; position:absolute; right:-10px; bottom:-10px; width:70px; height:70px;
+    border-radius:50%; opacity:.08; background:var(--accent);
+  }
+  .counter.sql{border-color:var(--sql);}
+  .counter.sql .value{color:var(--sql);}
+  .counter.sql::after{background:var(--sql); opacity:.14;}
+  .counter.warn{border-color:var(--warn);}
+  .counter.warn .value{color:var(--warn);}
+  .counter.warn::after{background:var(--warn); opacity:.14;}
+
+  /* ---------- category badges ---------- */
+  .cat-badge{
+    display:inline-flex; align-items:center; gap:5px; font-size:10px; font-weight:600;
+    padding:2px 8px; border-radius:99px; border:1px solid currentColor; white-space:nowrap;
+  }
+  .cat-dot{width:6px; height:6px; border-radius:50%; background:currentColor; flex-shrink:0;}
+  .feed-item.cat-sql{border-left:3px solid var(--sql); padding-left:13px;}
+
+  /* ---------- panels ---------- */
+  /* Variantes de ratio en classes plutôt qu'en style inline (voir plus bas dans le markup) :
+     un style inline a une spécificité CSS que la media query de repli ci-dessous ne peut
+     pas surclasser, ce qui empêchait certaines sections de repasser en une colonne sur
+     petit écran. */
+  .grid-2{display:grid; grid-template-columns:1.4fr 1fr; gap:16px;}
+  .grid-2.grid-2--even{grid-template-columns:1fr 1fr;}
+  .grid-2.grid-2--wide{grid-template-columns:1.3fr 1fr;}
+  .panel{
+    background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
+    padding:0; overflow:hidden; box-shadow:var(--shadow-sm);
+  }
+  .panel-head{
+    padding:12px 16px; border-bottom:1px solid var(--line-soft);
+    display:flex; align-items:center; justify-content:space-between;
+    background:var(--panel-2); gap:10px; flex-wrap:wrap;
+  }
+  .panel-head h2{font-family:var(--display); font-size:13px; margin:0; font-weight:600; letter-spacing:.2px;}
+  .panel-body{padding:14px 16px;}
+
+  /* ---------- filters ---------- */
+  .filter-row{display:flex; gap:6px; align-items:center; flex-wrap:wrap;}
+  .chip-group{display:flex; gap:6px; flex-wrap:wrap;}
+  .chip{
+    border:1px solid var(--line); background:var(--panel); color:var(--text-dim);
+    font-family:var(--mono); font-size:11px; padding:5px 10px; border-radius:99px; cursor:pointer;
+  }
+  .chip.active{border-color:var(--accent); color:var(--accent); background:var(--panel-2);}
+  .chip.sev-critique.active{border-color:var(--tp); color:var(--tp);}
+  .chip.sev-elevee.active{border-color:var(--warn); color:var(--warn);}
+  .chip.sev-moyenne.active{border-color:var(--accent); color:var(--accent);}
+  .chip.sev-faible.active{border-color:var(--ok); color:var(--ok);}
+  .search-input{
+    background:var(--panel); border:1px solid var(--line); border-radius:6px; color:var(--text);
+    font-family:var(--mono); font-size:12px; padding:6px 10px; width:160px;
+  }
+  .search-input:focus{outline:none; border-color:var(--accent);}
+
+  /* ---------- alert feed ---------- */
+  .feed{max-height:520px; overflow-y:auto;}
+  .feed-item{
+    display:grid; grid-template-columns:64px 1fr auto auto; gap:12px; align-items:center;
+    padding:11px 16px; border-bottom:1px solid var(--line-soft); font-size:12.5px;
+    cursor:pointer; transition:background .12s ease;
+  }
+  .feed-item:hover{background:var(--panel-2);}
+  .feed-item:last-child{border-bottom:none;}
+  .feed-item.status-acknowledged{opacity:.75;}
+  .feed-item.status-resolved,.feed-item.status-suppressed{opacity:.5;}
+  .badge{
+    font-size:10px; font-weight:600; padding:4px 8px; border-radius:4px; text-align:center;
+    letter-spacing:.4px;
+  }
+  .badge.tp{background:var(--tp-dim); color:var(--tp);}
+  .badge.fp{background:var(--fp); color:var(--fp-text);}
+  .badge.ok{background:rgba(53,214,143,.14); color:var(--ok);}
+  .repeat-badge{
+    display:inline-block; font-size:10.5px; font-weight:600; padding:1px 6px; border-radius:8px;
+    background:var(--panel-2); color:var(--text-dim); border:1px solid var(--line-soft);
+    margin-left:6px; vertical-align:middle;
+  }
+  .priority-badge{
+    display:inline-block; font-size:9.5px; font-weight:700; padding:1px 6px; border-radius:4px;
+    border:1px solid currentColor; margin-right:6px; vertical-align:middle; letter-spacing:.3px;
+  }
+  .chain-badge{
+    display:inline-block; font-size:9.5px; font-weight:600; padding:1px 6px; border-radius:4px;
+    background:rgba(240,176,60,.14); color:var(--warn); margin-right:6px; vertical-align:middle;
+  }
+  .status-label{font-style:italic;}
+  .feed-actions{display:flex; flex-direction:column; gap:4px;}
+  .feed-action-btn{
+    font-size:10px; padding:3px 8px; border-radius:4px; border:1px solid var(--line-soft);
+    background:var(--panel-2); color:var(--text-dim); cursor:pointer; white-space:nowrap;
+    transition:border-color .12s ease, color .12s ease;
+  }
+  .feed-action-btn:hover{border-color:var(--accent); color:var(--accent);}
+
+  /* ---------- historique connexions admin ---------- */
+  .auth-row-fail{border-left:3px solid var(--tp);}
+  .auth-row-ok{border-left:3px solid var(--ok);}
+  .auth-machine{color:var(--text-dim); font-size:11.5px;}
+  .auth-machine.unknown{font-style:italic;}
+  .feed-desc{display:flex; flex-direction:column; gap:2px; overflow:hidden;}
+  .feed-desc .rule{color:var(--text); white-space:nowrap; text-overflow:ellipsis; overflow:hidden;}
+  .feed-desc .meta{color:var(--text-dim); font-size:11px;}
+  .feed-conf{color:var(--text-dim); font-size:11px; white-space:nowrap; text-align:right;}
+  .feed-empty{padding:40px 16px; text-align:center; color:var(--text-dim); font-size:12.5px;}
+
+  /* ---------- flux brut de logs Wazuh (terminal style) ---------- */
+  .log-feed{font-family:var(--mono); font-size:11px;}
+  .log-line{
+    display:block; padding:7px 14px; border-left:3px solid var(--line);
+    border-bottom:1px solid var(--line-soft); white-space:nowrap; overflow-x:auto;
+    cursor:pointer; transition:background .12s ease;
+  }
+  .log-line::-webkit-scrollbar{height:0;}
+  .log-line:hover{background:var(--panel-2);}
+  .log-line:last-child{border-bottom:none;}
+  .log-ts{color:var(--text-dim); margin-right:10px;}
+  .log-agent{color:var(--accent); margin-right:10px;}
+  .log-sev-badge{
+    display:inline-block; font-size:9.5px; font-weight:700; padding:1px 6px; border-radius:4px;
+    border:1px solid currentColor; margin-right:10px; letter-spacing:.3px; vertical-align:middle;
+  }
+  .log-rule{color:var(--warn); margin-right:10px;}
+  .log-desc{color:var(--text); margin-right:10px;}
+  .log-extra{color:var(--text-dim);}
+  .log-cursor{padding:6px 14px; color:var(--ok); font-family:var(--mono); font-size:11px; animation:blink 1.2s infinite ease-in-out;}
+  .log-cursor.paused{color:var(--warn); animation:none;}
+  #btn-log-pause.active{border-color:var(--warn); color:var(--warn);}
+  .log-pause-badge{
+    border-color:var(--warn); color:var(--warn); background:rgba(240,176,60,.12);
+    display:inline-flex; align-items:center; cursor:default;
+  }
+
+  /* ---------- side panel (ops) ---------- */
+  .controls{display:flex; flex-direction:column; gap:14px;}
+  .toggle-row{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:10px 12px; background:var(--panel-2); border:1px solid var(--line); border-radius:6px;
+  }
+  .switch{position:relative; width:38px; height:20px; flex-shrink:0;}
+  .switch input{opacity:0; width:0; height:0;}
+  .slider{
+    position:absolute; cursor:pointer; inset:0; background:var(--fp); border-radius:99px; transition:.2s;
+  }
+  .slider::before{
+    content:""; position:absolute; width:14px; height:14px; left:3px; top:3px;
+    background:#fff; border-radius:50%; transition:.2s;
+  }
+  input:checked + .slider{background:var(--ok);}
+  input:checked + .slider::before{transform:translateX(18px);}
+  .note{font-size:11px; color:var(--text-dim); line-height:1.5; padding:10px 12px; background:var(--panel-2); border-radius:6px; border:1px dashed var(--line);}
+  .btn{
+    font-family:var(--mono); font-size:12.5px; font-weight:600; padding:9px 12px;
+    border-radius:6px; border:1px solid var(--line); background:var(--panel-2); color:var(--text);
+    cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;
+  }
+  .btn.primary{background:var(--accent); border-color:var(--accent); color:#06121a;}
+  .btn:hover{filter:brightness(1.1);}
+
+  /* ---------- panneau Opérations : grille responsive de mini-widgets ---------- */
+  .ops-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:16px 20px; align-items:start;}
+  .ops-grid .ops-cell{min-width:0;}
+
+  /* ---------- pouls du SOC (dernière alerte reçue, ticking en direct) ---------- */
+  .soc-pulse{
+    display:flex; align-items:center; gap:12px; padding:10px 12px;
+    background:var(--panel-2); border:1px solid var(--line); border-radius:6px;
+  }
+  .pulse-dot{width:12px; height:12px; border-radius:50%; background:var(--text-dim); flex-shrink:0; position:relative;}
+  .pulse-dot.pulse-fresh{background:var(--ok); box-shadow:0 0 0 0 rgba(53,214,143,.6); animation:pulse 2s infinite;}
+  .pulse-dot.pulse-warn{background:var(--warn);}
+  .pulse-dot.pulse-stale{background:var(--tp);}
+  .pulse-main{font-family:var(--display); font-weight:700; font-size:13px;}
+  .pulse-sub{font-size:10.5px; color:var(--text-dim); margin-top:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+
+  .mini-title{font-size:10.5px; text-transform:uppercase; letter-spacing:.5px; color:var(--text-dim); margin-bottom:8px;}
+  .mini-bar-row{display:grid; grid-template-columns:90px 1fr 30px; align-items:center; gap:8px; margin-bottom:7px; font-size:11px;}
+  .mini-bar-row .name{color:var(--text-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .mini-track{height:6px; background:var(--panel-2); border-radius:99px; overflow:hidden; border:1px solid var(--line-soft);}
+  .mini-fill{height:100%; border-radius:99px;}
+  .mini-bar-row .cnt{text-align:right; color:var(--text-dim);}
+  .chain-row{display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:8px; font-size:11px;}
+  .chain-row .name{color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .chain-row .cats{display:flex; flex-wrap:wrap; gap:4px; justify-content:flex-end;}
+
+  /* ---------- advanced view ---------- */
+  .stat-list{display:flex; flex-direction:column; gap:10px;}
+  .stat-row{display:flex; justify-content:space-between; align-items:center; font-size:12.5px;}
+  .stat-row .k{color:var(--text-dim);}
+  .stat-row .v{font-family:var(--display); font-weight:600;}
+
+  .bar-row{display:grid; grid-template-columns:150px 1fr 46px; align-items:center; gap:10px; margin-bottom:9px; font-size:11.5px; cursor:default;}
+  .bar-row .name{color:var(--text-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .bar-track{height:8px; background:var(--panel-2); border-radius:99px; overflow:hidden; border:1px solid var(--line-soft);}
+  .bar-fill{height:100%; background:linear-gradient(90deg, var(--accent), var(--ok)); border-radius:99px; transition:filter var(--dur-fast) var(--ease-out); min-width:2px;}
+  .bar-row:hover .bar-fill{filter:brightness(1.2);}
+  .bar-row:hover .name{color:var(--text);}
+  .bar-row .pct{text-align:right; color:var(--text-dim);}
+
+  .empty-state{padding:30px; text-align:center; color:var(--text-dim); font-size:12px;}
+  .sparkline-wrap{padding:6px 4px; position:relative;}
+  .spark-tooltip{
+    position:absolute; pointer-events:none; background:var(--panel-2); border:1px solid var(--line);
+    border-radius:6px; padding:4px 8px; font-size:11px; color:var(--text); white-space:nowrap;
+    transform:translate(-50%, -130%); opacity:0; transition:opacity var(--dur-fast) var(--ease-out);
+    box-shadow:var(--shadow-sm); z-index:2;
+  }
+  .spark-tooltip.visible{opacity:1;}
+
+  /* ---------- diagrams view ---------- */
+  .diagram-panel .panel-body{padding:20px;}
+  .diagram-svg{width:100%; height:auto; display:block;}
+  .diagram-caption{font-size:11px; color:var(--text-dim); margin-top:10px; line-height:1.5;}
+  .legend-row{display:flex; gap:16px; flex-wrap:wrap; margin-top:10px; font-size:11px; color:var(--text-dim);}
+  .legend-dot{display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:5px; vertical-align:middle;}
+
+  /* ---------- network view ---------- */
+  .topo-svg{width:100%; height:420px; display:block; background:var(--panel-2); border-radius:6px; border:1px solid var(--line-soft);}
+  .topo-node-label{font-family:var(--mono); font-size:9px; fill:var(--text-dim); pointer-events:none;}
+  .ip-risk-list{display:flex; flex-direction:column; gap:8px;}
+  .ip-risk-row{
+    display:grid; grid-template-columns:20px 1fr auto auto; align-items:center; gap:10px;
+    padding:9px 10px; border:1px solid var(--line-soft); border-radius:6px; cursor:pointer; font-size:11.5px;
+  }
+  .ip-risk-row:hover{border-color:var(--accent);}
+  .ip-risk-row .rank{font-family:var(--display); font-weight:700; color:var(--text-dim); font-size:12px; text-align:center;}
+  .ip-risk-row .ip{font-weight:600; word-break:break-all;}
+  .ip-risk-row .meta{font-size:10px; color:var(--text-dim); margin-top:2px;}
+  .ip-risk-row .cnt{
+    font-family:var(--display); font-weight:700; font-size:14px; color:var(--accent);
+    padding:2px 9px; background:var(--panel-2); border-radius:6px;
+  }
+
+  /* ---------- modal ---------- */
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(3,7,11,.65); backdrop-filter:blur(2px);
+    display:none; align-items:flex-start; justify-content:center; z-index:100; padding:6vh 16px;
+  }
+  .modal-overlay.active{display:flex;}
+  .modal{
+    background:var(--panel); border:1px solid var(--line); border-radius:var(--radius-lg);
+    max-width:640px; width:100%; max-height:86vh; overflow-y:auto;
+    box-shadow:var(--shadow-lg); animation:modal-in var(--dur-base) var(--ease-out);
+  }
+  @keyframes modal-in{
+    from{opacity:0; transform:translateY(-8px) scale(.98);}
+    to{opacity:1; transform:translateY(0) scale(1);}
+  }
+  .modal-head{
+    padding:14px 18px; border-bottom:1px solid var(--line-soft); background:var(--panel-2);
+    display:flex; align-items:center; justify-content:space-between; position:sticky; top:0;
+  }
+  .modal-head h3{font-family:var(--display); font-size:14px; margin:0;}
+  .modal-close{border:none; background:transparent; color:var(--text-dim); font-size:18px; cursor:pointer; line-height:1;}
+  .modal-close:hover{color:var(--tp);}
+  .modal-body{padding:18px;}
+  .modal-section{margin-bottom:16px;}
+  .modal-section h4{font-size:10.5px; text-transform:uppercase; letter-spacing:.5px; color:var(--text-dim); margin:0 0 8px;}
+  .kv-grid{display:grid; grid-template-columns:1fr 1fr; gap:8px 16px;}
+  .kv{display:flex; flex-direction:column; gap:2px; font-size:12.5px;}
+  .kv .k{color:var(--text-dim); font-size:10.5px; text-transform:uppercase; letter-spacing:.3px;}
+  .kv .v{word-break:break-word;}
+  pre.log-block{
+    background:var(--panel-2); border:1px solid var(--line); border-radius:6px; padding:12px;
+    font-size:11.5px; line-height:1.6; overflow-x:auto; margin:0; max-height:280px; white-space:pre-wrap; word-break:break-word;
+  }
+  .json-key{color:var(--accent);}
+  .json-str{color:var(--ok);}
+  .json-num{color:var(--warn);}
+  .copy-btn{font-size:11px; padding:5px 10px;}
+
+  /* ---------- AI agent panel ---------- */
+  .ai-overlay{
+    position:fixed; inset:0; background:rgba(3,7,11,.35); z-index:90; display:none;
+  }
+  .ai-overlay.active{display:block;}
+  .ai-panel{
+    position:fixed; top:0; right:-420px; width:400px; max-width:92vw; height:100vh;
+    background:var(--panel); border-left:1px solid var(--line); z-index:95;
+    display:flex; flex-direction:column; transition:right .25s ease; box-shadow:-10px 0 40px rgba(0,0,0,.3);
+  }
+  .ai-panel.active{right:0;}
+  .ai-head{
+    padding:16px 18px; border-bottom:1px solid var(--line-soft); background:var(--panel-2);
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .ai-head-title{display:flex; align-items:center; gap:10px;}
+  .ai-avatar{
+    width:30px; height:30px; border-radius:8px; background:linear-gradient(135deg, var(--ai), var(--accent));
+    display:flex; align-items:center; justify-content:center; font-size:15px;
+  }
+  .ai-head h3{font-family:var(--display); font-size:13.5px; margin:0;}
+  .ai-head .sub{font-size:10.5px; color:var(--text-dim);}
+  .ai-messages{flex:1; overflow-y:auto; padding:16px 18px; display:flex; flex-direction:column; gap:12px;}
+  .ai-msg{max-width:88%; font-size:12.5px; line-height:1.55; padding:10px 12px; border-radius:8px;}
+  .ai-msg.assistant{background:var(--panel-2); border:1px solid var(--line-soft); align-self:flex-start; border-bottom-left-radius:2px;}
+  .ai-msg.user{background:var(--ai-dim); color:var(--text); align-self:flex-end; border-bottom-right-radius:2px;}
+  .ai-msg.system{align-self:center; color:var(--text-dim); font-size:11px; text-align:center; background:none;}
+  .ai-typing{display:flex; gap:4px; align-self:flex-start; padding:10px 12px;}
+  .ai-typing span{width:6px; height:6px; border-radius:50%; background:var(--text-dim); animation:blink 1.2s infinite ease-in-out;}
+  .ai-typing span:nth-child(2){animation-delay:.2s;}
+  .ai-typing span:nth-child(3){animation-delay:.4s;}
+  @keyframes blink{0%,80%,100%{opacity:.25;} 40%{opacity:1;}}
+  .ai-chips{display:flex; flex-wrap:wrap; gap:6px; padding:0 18px 12px;}
+  .ai-chip{
+    font-size:10.5px; padding:6px 10px; border-radius:99px; border:1px solid var(--line);
+    background:var(--panel-2); color:var(--text-dim); cursor:pointer;
+  }
+  .ai-chip:hover{border-color:var(--ai); color:var(--ai);}
+  .ai-input-row{
+    display:flex; gap:8px; padding:14px 18px; border-top:1px solid var(--line-soft); background:var(--panel-2);
+  }
+  .ai-input{
+    flex:1; background:var(--panel); border:1px solid var(--line); border-radius:6px; color:var(--text);
+    font-family:var(--mono); font-size:12.5px; padding:9px 11px; resize:none;
+  }
+  .ai-input:focus{outline:none; border-color:var(--ai);}
+  .ai-send{
+    background:var(--ai); border:1px solid var(--ai); color:#0d0620; border-radius:6px; padding:0 16px;
+    font-weight:600; cursor:pointer; font-family:var(--mono); font-size:12.5px;
+  }
+  .ai-send:disabled{opacity:.5; cursor:not-allowed;}
+  .ai-footnote{font-size:10px; color:var(--text-dim); padding:0 18px 14px; text-align:center;}
+
+  /* ---------- SQL Server view ---------- */
+  .table-wrap{max-height:420px; overflow:auto; border-radius:6px;}
+  table.data-table{width:100%; border-collapse:collapse; font-size:11.5px;}
+  table.data-table thead th{
+    position:sticky; top:0; background:var(--panel-2); color:var(--text-dim);
+    text-align:left; padding:8px 10px; font-size:10.5px; text-transform:uppercase;
+    letter-spacing:.4px; border-bottom:1px solid var(--line); white-space:nowrap;
+  }
+  table.data-table tbody td{
+    padding:8px 10px; border-bottom:1px solid var(--line-soft); white-space:nowrap;
+    max-width:220px; overflow:hidden; text-overflow:ellipsis;
+  }
+  table.data-table tbody tr:hover{background:var(--panel-2);}
+  .pill-state{font-size:10px; padding:2px 8px; border-radius:99px; font-weight:600;}
+  .pill-state.running{background:var(--tp-dim); color:var(--tp);}
+  .pill-state.sleeping{background:var(--fp); color:var(--fp-text);}
+  .user-card{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:9px 12px; border:1px solid var(--line-soft); border-radius:6px; margin-bottom:8px; font-size:12px;
+  }
+  .user-card .login{font-weight:600;}
+  .user-card .sub{font-size:10.5px; color:var(--text-dim); margin-top:2px;}
+  .user-card .count{
+    font-family:var(--display); font-weight:700; font-size:16px; color:var(--accent);
+    padding:2px 10px; background:var(--panel-2); border-radius:6px;
+  }
+  .sql-note{font-size:11px; color:var(--text-dim); line-height:1.5; padding:10px 12px; background:var(--panel-2); border-radius:6px; border:1px dashed var(--line); margin-top:12px;}
+
+  /* ---------- Hygiène IT ---------- */
+  .hygiene-row{cursor:pointer;}
+  .hygiene-row.selected{background:var(--panel-2);}
+  .score-pill{
+    display:inline-flex; align-items:center; justify-content:center; min-width:34px;
+    font-family:var(--display); font-weight:700; font-size:12px; padding:3px 8px; border-radius:99px;
+  }
+  .score-pill.good{background:var(--tp-dim); color:var(--ok); background:rgba(53,214,143,.12);}
+  .score-pill.warn{background:rgba(240,176,60,.14); color:var(--warn);}
+  .score-pill.bad{background:var(--tp-dim); color:var(--tp);}
+  .hygiene-tabs{display:flex; gap:6px; padding:12px 16px 0;}
+  .hygiene-subview{display:none;}
+  .hygiene-subview.active{display:block;}
+  .port-chip{
+    display:inline-block; font-size:10.5px; padding:2px 7px; border-radius:99px; margin:2px 3px 2px 0;
+    background:var(--tp-dim); color:var(--tp); border:1px solid var(--tp);
+  }
+  .cve-badge{
+    display:inline-flex; align-items:center; gap:4px; font-size:10px; font-weight:600;
+    padding:2px 8px; border-radius:99px; white-space:nowrap;
+  }
+  .cve-badge.critical{background:var(--tp-dim); color:var(--tp); border:1px solid var(--tp);}
+  .cve-badge.high{background:rgba(240,176,60,.14); color:var(--warn); border:1px solid var(--warn);}
+  .cve-badge.medium{background:var(--fp); color:var(--fp-text); border:1px solid var(--fp-text);}
+  .cve-badge.low{background:var(--panel-2); color:var(--text-dim); border:1px solid var(--line-soft);}
+  .cve-summary-cell{display:flex; flex-wrap:wrap; gap:4px;}
+
+  /* ---------- toasts ---------- */
+  .toast-stack{
+    position:fixed; bottom:18px; right:18px; z-index:200;
+    display:flex; flex-direction:column-reverse; gap:8px; width:340px; max-width:calc(100vw - 32px);
+    pointer-events:none;
+  }
+  .toast{
+    background:var(--panel); border:1px solid var(--line); border-left:3px solid var(--accent);
+    border-radius:8px; padding:11px 14px; box-shadow:var(--shadow-md); pointer-events:auto;
+    display:flex; gap:10px; align-items:flex-start; animation:toast-in var(--dur-base) var(--ease-spring);
+  }
+  .toast.leaving{animation:toast-out var(--dur-base) var(--ease-out) forwards;}
+  .toast.tp{border-left-color:var(--tp);}
+  .toast.ok{border-left-color:var(--ok);}
+  .toast.warn{border-left-color:var(--warn);}
+  .toast .toast-icon{flex-shrink:0; margin-top:1px; color:var(--accent);}
+  .toast.tp .toast-icon{color:var(--tp);}
+  .toast.ok .toast-icon{color:var(--ok);}
+  .toast.warn .toast-icon{color:var(--warn);}
+  .toast .toast-body{flex:1; min-width:0;}
+  .toast .toast-title{font-weight:600; font-size:12.5px; margin-bottom:2px;}
+  .toast .toast-msg{font-size:11.5px; color:var(--text-dim); line-height:1.4; overflow-wrap:break-word;}
+  .toast .toast-close{background:none; border:none; color:var(--text-dim); cursor:pointer; padding:0; flex-shrink:0;}
+  .toast .toast-close svg{width:12px; height:12px;}
+  @keyframes toast-in{from{opacity:0; transform:translateX(24px) scale(.96);} to{opacity:1; transform:translateX(0) scale(1);}}
+  @keyframes toast-out{to{opacity:0; transform:translateX(24px) scale(.96);}}
+
+  /* ---------- command palette ---------- */
+  .cmdk-overlay{
+    position:fixed; inset:0; background:rgba(3,7,11,.55); backdrop-filter:blur(2px);
+    display:none; align-items:flex-start; justify-content:center; z-index:150; padding:12vh 16px;
+  }
+  .cmdk-overlay.active{display:flex;}
+  .cmdk{
+    width:100%; max-width:560px; background:var(--panel); border:1px solid var(--line);
+    border-radius:var(--radius-lg); box-shadow:var(--shadow-lg); overflow:hidden;
+    animation:modal-in var(--dur-base) var(--ease-out);
+  }
+  .cmdk-input-row{
+    display:flex; align-items:center; gap:10px; padding:14px 16px;
+    border-bottom:1px solid var(--line-soft); color:var(--text-dim);
+  }
+  .cmdk-input-row svg{width:16px; height:16px; flex-shrink:0;}
+  #cmdk-input{
+    flex:1; background:none; border:none; color:var(--text); font-family:var(--mono);
+    font-size:14px; outline:none;
+  }
+  .cmdk-hint{
+    font-size:10px; color:var(--text-dim); border:1px solid var(--line); border-radius:4px;
+    padding:2px 6px; flex-shrink:0;
+  }
+  .cmdk-list{max-height:360px; overflow-y:auto; padding:6px;}
+  .cmdk-group{font-size:10px; text-transform:uppercase; letter-spacing:.5px; color:var(--text-dim); padding:8px 10px 4px;}
+  .cmdk-item{
+    display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:6px;
+    cursor:pointer; font-size:13px;
+  }
+  .cmdk-item svg{width:15px; height:15px; color:var(--text-dim); flex-shrink:0;}
+  .cmdk-item .cmdk-item-sub{font-size:10.5px; color:var(--text-dim); margin-left:auto; flex-shrink:0;}
+  .cmdk-item.active{background:var(--accent); color:#06121a;}
+  .cmdk-item.active svg{color:#06121a;}
+  .cmdk-item.active .cmdk-item-sub{color:rgba(6,18,26,.65);}
+  .cmdk-empty{padding:24px; text-align:center; color:var(--text-dim); font-size:12px;}
+
+  /* ---------- skeleton loading ---------- */
+  .skeleton{
+    background:linear-gradient(90deg, var(--panel-2) 25%, var(--line-soft) 50%, var(--panel-2) 75%);
+    background-size:200% 100%; animation:skeleton-sweep 1.4s ease-in-out infinite;
+    border-radius:4px; display:block;
+  }
+  @keyframes skeleton-sweep{0%{background-position:200% 0;} 100%{background-position:-200% 0;}}
+  .skeleton-row{display:flex; align-items:center; gap:12px; padding:11px 16px;}
+  .skeleton-row .skeleton.badge-sk{width:44px; height:20px; border-radius:4px;}
+  .skeleton-row .skeleton.line-sk{height:11px; flex:1;}
+
+  /* ---------- nouvel item dans le flux (arrivée via SSE) ---------- */
+  @keyframes feed-item-new{
+    0%{background:var(--accent); background:color-mix(in srgb, var(--accent) 18%, transparent);}
+    100%{background:transparent;}
+  }
+  .feed-item.just-arrived, .log-line.just-arrived{animation:feed-item-new 1.6s var(--ease-out);}
+
+  ::-webkit-scrollbar{width:8px;}
+  ::-webkit-scrollbar-thumb{background:var(--line); border-radius:99px;}
+
+  @media (max-width: 1200px){
+    /* Cible aussi les variantes .grid-2--even/--wide explicitement : leur sélecteur à deux
+       classes a une spécificité plus élevée qu'un simple ".grid-2", qui ne les surclasserait
+       pas sinon (même piège que les anciens style inline que ces variantes remplacent). */
+    .grid-2, .grid-2.grid-2--even, .grid-2.grid-2--wide{grid-template-columns:1fr;}
+  }
+  @media (max-width: 860px){
+    header{flex-wrap:wrap; gap:10px;}
+    .ai-panel{width:100%; max-width:100%;}
+  }
+</style>
+</head>
+<body data-theme="dark">
+
+<header>
+  <div class="brand">
+    <div class="mark">ML</div>
+    <div>
+      <h1>SOC Triage Console</h1>
+      <div class="sub">Wazuh · Random Forest L1 classifier</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="tabs">
+      <button class="tab-btn active" data-view="logs">Logs Wazuh</button>
+      <button class="tab-btn" data-view="classification">Classification ML</button>
+      <button class="tab-btn" data-view="advanced">Vue avancée</button>
+      <button class="tab-btn" data-view="states">États SOC</button>
+      <button class="tab-btn" data-view="network">Réseau</button>
+      <button class="tab-btn" data-view="sql">SQL Server</button>
+      <button class="tab-btn" data-view="hygiene">Hygiène IT</button>
+      <button class="tab-btn" data-view="auth-history">Connexions admin</button>
+    </div>
+    <div class="status-pill">
+      <span id="api-dot" class="dot offline"></span>
+      <span id="api-status-text">API hors ligne</span>
+    </div>
+    <div class="status-pill" id="sync-pill" title="Les données et le thème sont diffusés en direct vers les autres fenêtres/onglets ouverts sur ce dashboard">
+      <span id="sync-dot" class="dot offline"></span>
+      <span id="sync-status-text">Sync…</span>
+    </div>
+    <div class="status-pill push-pill" id="push-pill" title="Connexion au flux temps réel (Server-Sent Events) — les pages Logs Wazuh et Classification ML reçoivent les nouvelles alertes instantanément sans attendre le prochain cycle de polling">
+      <span class="btn-icon" id="push-icon" data-icon="zap"></span>
+      <span id="push-status-text">Connexion…</span>
+    </div>
+    <button class="icon-btn" id="palette-toggle" title="Palette de commandes (Ctrl/Cmd+K)"></button>
+    <button class="icon-btn ai-btn" id="ai-toggle" title="Assistant IA (Gemini 3.1 Flash Lite)"></button>
+    <button class="icon-btn" id="theme-toggle" title="Thème clair/sombre"></button>
+    <div class="status-pill" id="session-pill" title="Session admin">
+      <span id="session-label">…</span>
+      <button class="icon-btn" id="logout-btn" title="Déconnexion" style="width:22px;height:22px;"></button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- ============ PAGE LOGS WAZUH ============ -->
+  <section id="view-logs" class="view active">
+    <div class="counters">
+      <div class="counter">
+        <div class="label">Logs reçus (fenêtre affichée)</div>
+        <div class="value" id="log-c-total">0</div>
+      </div>
+      <div class="counter">
+        <div class="label">Agents actifs</div>
+        <div class="value" id="log-c-agents">0</div>
+      </div>
+      <div class="counter">
+        <div class="label">Règles distinctes</div>
+        <div class="value" id="log-c-rules">0</div>
+      </div>
+      <div class="counter rate">
+        <div class="label">Débit (logs/min)</div>
+        <div class="value" id="log-c-rate">0.0</div>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-bottom:16px;">
+      <div class="panel-head">
+        <h2>Logs Wazuh — flux brut en temps réel</h2>
+        <div class="filter-row">
+          <div class="chip-group" id="log-sev-filter">
+            <button class="chip active" data-sev="">Tous niveaux</button>
+            <button class="chip sev-critique" data-sev="Critique" title="rule.level ≥ 12">Critique</button>
+            <button class="chip sev-elevee" data-sev="Élevée" title="rule.level 8-11">Élevée</button>
+            <button class="chip sev-moyenne" data-sev="Moyenne" title="rule.level 4-7">Moyenne</button>
+            <button class="chip sev-faible" data-sev="Faible" title="rule.level < 4">Faible</button>
+          </div>
+          <input class="search-input" id="log-search" placeholder="Filtrer règle / agent / IP…">
+          <span class="chip log-pause-badge" id="log-pause-badge" style="display:none;"></span>
+          <button class="btn" id="btn-log-pause" style="padding:6px 10px; font-size:11.5px;"><span class="btn-icon" data-icon="pause"></span> Pause</button>
+          <button class="btn" id="btn-export-logs" style="padding:6px 10px; font-size:11.5px;"><span class="btn-icon" data-icon="download"></span> Exporter (JSON)</button>
+        </div>
+      </div>
+      <div class="panel-body" style="padding:0;">
+        <div class="feed log-feed" id="log-feed" style="max-height:620px;">
+          <div class="skeleton-row"><span class="skeleton line-sk"></span></div>
+          <div class="skeleton-row"><span class="skeleton line-sk"></span></div>
+          <div class="skeleton-row"><span class="skeleton line-sk"></span></div>
+          <div class="skeleton-row"><span class="skeleton line-sk"></span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <h2>Activité &amp; pouls du SOC</h2>
+        <span style="font-size:10.5px; color:var(--text-dim);">Signal de vie du flux Wazuh — clique un agent ou une règle pour filtrer le flux ci-dessus.</span>
+      </div>
+      <div class="panel-body">
+        <div class="ops-grid">
+          <div class="ops-cell">
+            <div class="mini-title">Pouls du SOC (temps réel)</div>
+            <div class="soc-pulse" id="soc-pulse">
+              <span class="pulse-dot" id="pulse-dot"></span>
+              <div style="min-width:0;">
+                <div class="pulse-main" id="pulse-elapsed">En attente de la première alerte…</div>
+                <div class="pulse-sub" id="pulse-detail">—</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="ops-cell">
+            <div class="mini-title">Agents les plus actifs (bruit)</div>
+            <div id="log-top-agents"><div class="empty-state" style="padding:10px 0;">Pas encore de données.</div></div>
+          </div>
+
+          <div class="ops-cell">
+            <div class="mini-title">Règles les plus fréquentes</div>
+            <div id="log-top-rules"><div class="empty-state" style="padding:10px 0;">Pas encore de données.</div></div>
+          </div>
+        </div>
+        <div class="note" style="margin-top:14px;">
+          Flux brut = ce que Wazuh a réellement remonté, avant tout verdict du modèle ML — c'est
+          cette page qui remplace la consultation directe de l'agent Wazuh. Le verdict TP/FP de
+          chaque log est disponible sur la page « Classification ML ». L'historique survit aux
+          redémarrages de l'API (journal <code>data/alerts.db</code>).
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PAGE CLASSIFICATION ML ============ -->
+  <section id="view-classification" class="view">
+    <div class="counters">
+      <div class="counter counter-clickable" data-counter-filter="all" title="Cliquer pour voir toutes les alertes">
+        <div class="label">Alertes traitées</div>
+        <div class="value" id="c-total">0</div>
+      </div>
+      <div class="counter tp counter-clickable" data-counter-filter="tp" title="Cliquer pour filtrer sur les True Positive">
+        <div class="label">True Positive</div>
+        <div class="value" id="c-tp">0</div>
+      </div>
+      <div class="counter fp counter-clickable" data-counter-filter="fp" title="Cliquer pour filtrer sur les False Positive">
+        <div class="label">False Positive</div>
+        <div class="value" id="c-fp">0</div>
+      </div>
+      <div class="counter rate">
+        <div class="label">Débit (alertes/min)</div>
+        <div class="value" id="c-rate">0.0</div>
+      </div>
+      <div class="counter conf">
+        <div class="label">Confiance moy.</div>
+        <div class="value" id="c-conf">0%</div>
+      </div>
+      <div class="counter">
+        <div class="label">Taux TP</div>
+        <div class="value" id="c-tprate">0%</div>
+      </div>
+      <div class="counter sql counter-clickable" data-counter-filter="sql" title="Cliquer pour filtrer sur la catégorie SQL">
+        <div class="label">Alertes SQL</div>
+        <div class="value" id="c-sql">0</div>
+      </div>
+      <div class="counter warn counter-clickable" data-counter-filter="unresolved" title="Cliquer pour voir les True Positive non résolus">
+        <div class="label">Non résolu (fenêtre affichée)</div>
+        <div class="value" id="c-unresolved">0</div>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-bottom:16px;">
+      <div class="panel-head">
+        <h2>Classification ML — verdicts en direct</h2>
+        <div class="filter-row">
+          <button class="chip" data-filter="all">Toutes</button>
+          <button class="chip active" data-filter="tp">TP</button>
+          <button class="chip" data-filter="fp">FP</button>
+          <button class="chip" data-filter="sql" style="border-color:var(--sql); color:var(--sql);" id="chip-sql">SQL</button>
+          <input class="search-input" id="feed-search" placeholder="Filtrer règle / agent…">
+          <label style="display:flex; align-items:center; gap:5px; font-size:11.5px; color:var(--text-dim); white-space:nowrap;">
+            <input type="checkbox" id="hide-resolved" checked> Masquer résolu/ignoré
+          </label>
+        </div>
+      </div>
+      <div class="panel-body" style="padding:0;">
+        <div id="quick-filter-banner" style="display:none; padding:8px 16px; border-bottom:1px solid var(--line-soft); background:var(--panel-2); font-size:11.5px; color:var(--text-dim); align-items:center; gap:8px;">
+          <span id="quick-filter-kind">Filtré</span> : <span id="quick-filter-label" style="color:var(--text); font-weight:600;"></span>
+          <button class="chip" id="quick-filter-clear" style="padding:2px 8px; font-size:10.5px;">✕ Effacer</button>
+        </div>
+        <div class="feed" id="feed" style="max-height:620px;">
+          <div class="skeleton-row"><span class="skeleton badge-sk"></span><span class="skeleton line-sk"></span></div>
+          <div class="skeleton-row"><span class="skeleton badge-sk"></span><span class="skeleton line-sk"></span></div>
+          <div class="skeleton-row"><span class="skeleton badge-sk"></span><span class="skeleton line-sk"></span></div>
+          <div class="skeleton-row"><span class="skeleton badge-sk"></span><span class="skeleton line-sk"></span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <h2>Triage &amp; priorisation</h2>
+        <span style="font-size:10.5px; color:var(--text-dim);">Tout est cliquable : agent, règle ou sévérité filtrent le flux ci-dessus.</span>
+      </div>
+      <div class="panel-body controls">
+        <div class="toggle-row">
+          <div>
+            <div style="font-weight:600;">Actualisation live</div>
+            <div style="color:var(--text-dim); font-size:11px; margin-top:2px;">Statistiques toutes les 5s (le flux d'alertes est poussé en temps réel, voir pastille "Push temps réel")</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="toggle-live" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <button class="btn" id="btn-export"><span class="btn-icon" data-icon="download"></span> Exporter les alertes affichées (JSON)</button>
+
+        <div class="ops-grid">
+          <div class="ops-cell">
+            <div class="mini-title">Priorité maintenant (fenêtre affichée)</div>
+            <div id="priority-now"><div class="empty-state" style="padding:10px 0;">Pas encore de données.</div></div>
+          </div>
+
+          <div class="ops-cell">
+            <div class="mini-title">Chaînes d'attaque en cours (fenêtre affichée)</div>
+            <div id="chain-alerts"><div class="empty-state" style="padding:10px 0;">Aucun signal corrélé pour l'instant.</div></div>
+          </div>
+
+          <div class="ops-cell">
+            <div class="mini-title">Top agents (fenêtre affichée)</div>
+            <div id="top-agents"><div class="empty-state" style="padding:10px 0;">Pas encore de données.</div></div>
+          </div>
+
+          <div class="ops-cell">
+            <div class="mini-title">Top règles déclenchées (fenêtre affichée)</div>
+            <div id="top-rules"><div class="empty-state" style="padding:10px 0;">Pas encore de données.</div></div>
+          </div>
+
+          <div class="ops-cell">
+            <div class="mini-title">Répartition sévérité (fenêtre affichée)</div>
+            <div id="severity-dist"><div class="empty-state" style="padding:10px 0;">Pas encore de données.</div></div>
+          </div>
+        </div>
+
+        <div class="note">
+          Seuil de décision du modèle : confiance ≥ 0.6 → True Positive. Les alertes True Positive
+          déclenchent la notification Telegram via le workflow n8n en aval. Clique sur une entrée
+          du flux, ou sur n'importe quel widget ci-dessus, pour en voir le détail ou filtrer.
+          L'historique et les compteurs survivent aux redémarrages de l'API.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VUE AVANCÉE ============ -->
+  <section id="view-advanced" class="view">
+    <div class="grid-2">
+      <div class="panel">
+        <div class="panel-head"><h2>Statistiques agrégées</h2></div>
+        <div class="panel-body stat-list">
+          <div class="stat-row"><span class="k">Total traité</span><span class="v" id="a-total">0</span></div>
+          <div class="stat-row"><span class="k">True Positive</span><span class="v" style="color:var(--tp);" id="a-tp">0</span></div>
+          <div class="stat-row"><span class="k">False Positive</span><span class="v" id="a-fp">0</span></div>
+          <div class="stat-row"><span class="k">Taux TP</span><span class="v" id="a-rate">0%</span></div>
+          <div class="stat-row"><span class="k">Débit (alertes/min)</span><span class="v" id="a-apm">0.0</span></div>
+          <div class="stat-row"><span class="k">Confiance moyenne</span><span class="v" id="a-conf">0%</span></div>
+        </div>
+        <div class="panel-body" style="border-top:1px solid var(--line-soft);">
+          <div class="mini-title">Volume d'alertes — depuis l'ouverture de la session</div>
+          <div class="sparkline-wrap">
+            <svg id="sparkline" class="diagram-svg" viewBox="0 0 560 120" preserveAspectRatio="none"></svg>
+            <div class="spark-tooltip" id="spark-tooltip"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h2>Importance des features (top 12)</h2></div>
+        <div class="panel-body" id="importance-body">
+          <div class="empty-state">Modèle non chargé ou pas encore de données.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:16px;">
+      <div class="panel-head">
+        <h2>Répartition par catégorie de menace</h2>
+        <span style="font-size:10.5px; color:var(--text-dim);">Session complète (depuis le démarrage de l'API)</span>
+      </div>
+      <div class="panel-body" id="category-breakdown">
+        <div class="empty-state">Pas encore de données.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VUE ÉTATS SOC ============ -->
+  <section id="view-states" class="view">
+    <div class="grid-2 grid-2--even">
+      <div class="panel diagram-panel">
+        <div class="panel-head"><h2>Cycle de vie d'une alerte</h2></div>
+        <div class="panel-body">
+          <svg id="lifecycle-diagram" class="diagram-svg" viewBox="0 0 560 420"></svg>
+          <div class="diagram-caption">
+            Les compteurs "Triage ML" / "Escaladé" / "Clôturé (bruit)" reflètent les données réelles de
+            la session. Les étapes en aval de la classification (investigation L2, confinement,
+            résolution) relèvent du suivi manuel côté ticketing et ne sont pas mesurées ici.
+          </div>
+        </div>
+      </div>
+
+      <div class="panel diagram-panel">
+        <div class="panel-head"><h2>Couverture MITRE ATT&amp;CK (tactiques observées)</h2></div>
+        <div class="panel-body">
+          <svg id="mitre-diagram" class="diagram-svg" viewBox="0 0 560 400"></svg>
+          <div class="legend-row">
+            <span><span class="legend-dot" style="background:var(--accent);"></span>Tactique observée dans le flux affiché</span>
+            <span><span class="legend-dot" style="background:var(--line);"></span>Non observée</span>
+            <span><span class="legend-dot" style="background:var(--ai);"></span>Lien = tactiques co-observées sur un même agent</span>
+          </div>
+          <div class="note" style="margin-top:10px;">
+            <strong>À quoi servent les traits entre les nœuds ?</strong> Ce ne sont pas des relations officielles
+            du référentiel MITRE : un trait relie deux tactiques observées pour le <strong>même agent Wazuh</strong>
+            dans la fenêtre d'alertes affichée. Plus il est épais, plus ces deux tactiques apparaissent ensemble
+            souvent. Ça permet de repérer en un coup d'œil une <strong>chaîne d'attaque en cours</strong> sur un
+            agent (ex. Initial Access → Execution → Command and Control) plutôt que des alertes isolées et sans
+            lien entre elles, et donc de prioriser un agent qui progresse sur plusieurs étapes ATT&amp;CK au lieu
+            d'un agent simplement bruyant sur une seule tactique répétée.
+          </div>
+          <div class="diagram-caption" id="mitre-caption">
+            En attente de champs MITRE (rule_mitre_tactic) dans les alertes reçues.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VUE RÉSEAU ============ -->
+  <section id="view-network" class="view">
+    <div class="grid-2 grid-2--wide">
+      <div class="panel diagram-panel">
+        <div class="panel-head">
+          <h2>Topologie réseau (agents ↔ IP observées)</h2>
+          <div class="filter-row">
+            <button class="chip" id="topo-reset">Réinitialiser la disposition</button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <svg id="topo-graph" class="topo-svg" viewBox="0 0 720 420" preserveAspectRatio="xMidYMid meet"></svg>
+          <div class="legend-row">
+            <span><span class="legend-dot" style="background:var(--accent);"></span>Agent Wazuh</span>
+            <span><span class="legend-dot" style="background:var(--tp);"></span>IP majoritairement True Positive</span>
+            <span><span class="legend-dot" style="background:var(--ok);"></span>IP majoritairement False Positive</span>
+          </div>
+          <div class="diagram-caption">
+            Construit dynamiquement à partir des 25 dernières alertes reçues (<code>/alerts/recent</code>). Taille des
+            nœuds = volume d'alertes, épaisseur des liens = volume sur ce lien agent↔IP. Clique sur un nœud IP pour
+            filtrer le flux d'alertes (vue L1) sur cette adresse.
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h2>IP sources à risque</h2></div>
+        <div class="panel-body">
+          <div class="ip-risk-list" id="ip-risk-list">
+            <div class="empty-state">Pas encore de données.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VUE SQL SERVER ============ -->
+  <section id="view-sql" class="view">
+    <div class="counters">
+      <div class="counter">
+        <div class="label">Connexions actives</div>
+        <div class="value" id="sql-c-sessions">—</div>
+      </div>
+      <div class="counter">
+        <div class="label">Utilisateurs distincts</div>
+        <div class="value" id="sql-c-users">—</div>
+      </div>
+      <div class="counter">
+        <div class="label">Connectivité SQL</div>
+        <div class="value" id="sql-c-status" style="font-size:15px;">
+          <span class="dot offline" id="sql-dot" style="display:inline-block; margin-right:6px;"></span><span id="sql-status-text">Inconnue</span>
+        </div>
+      </div>
+      <div class="counter">
+        <div class="label">Événements corrélés (agent)</div>
+        <div class="value" id="sql-c-events">—</div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:16px;">
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Connexions actives — sys.dm_exec_sessions</h2>
+          <input class="search-input" id="sql-sessions-search" placeholder="Filtrer login / hôte / programme…">
+        </div>
+        <div class="panel-body" style="padding:0;">
+          <div class="table-wrap">
+            <table class="data-table" id="sql-sessions-table">
+              <thead><tr>
+                <th>Session</th><th>Login</th><th>Hôte client</th><th>Programme</th>
+                <th>Base</th><th>Statut</th><th>IP client</th><th>Connecté depuis</th><th>Dernière requête</th>
+              </tr></thead>
+              <tbody><tr><td colspan="9" class="empty-state">En attente de connexion au SQL Server…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h2>Utilisateurs actifs</h2></div>
+        <div class="panel-body" id="sql-users-list" style="max-height:420px; overflow-y:auto;">
+          <div class="empty-state">Pas encore de données.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2 grid-2--even" style="margin-bottom:16px;">
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Rôles serveur (par login)</h2>
+        </div>
+        <div class="panel-body" style="padding:0;">
+          <div class="table-wrap">
+            <table class="data-table" id="sql-roles-table">
+              <thead><tr><th>Login</th><th>Type</th><th>Désactivé</th><th>Rôle serveur</th></tr></thead>
+              <tbody><tr><td colspan="4" class="empty-state">En attente de données.</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h2>Permissions explicites (niveau serveur)</h2></div>
+        <div class="panel-body" style="padding:0;">
+          <div class="table-wrap">
+            <table class="data-table" id="sql-perms-table">
+              <thead><tr><th>Compte</th><th>Type</th><th>Permission</th><th>État</th></tr></thead>
+              <tbody><tr><td colspan="4" class="empty-state">En attente de données.</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><h2>Événements de sécurité corrélés (agent SQL Server, déjà classifiés ML)</h2></div>
+      <div class="panel-body" style="padding:0;">
+        <div class="feed" id="sql-events-feed">
+          <div class="feed-empty">Aucun événement pour l'instant.</div>
+        </div>
+      </div>
+      <div class="panel-body" style="padding-top:0;">
+        <div class="sql-note">
+          Cette section relit l'historique d'alertes déjà traité par le classifieur ML (aucune requête SQL
+          directe), filtré sur l'agent Wazuh de la VM SQL Server — configuré via <code>SQLSRV_WAZUH_AGENT_NAME</code>
+          côté API. Les tableaux ci-dessus (connexions, utilisateurs, rôles, permissions) sont eux en lecture
+          directe des DMV SQL Server via un login dédié en lecture seule.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VUE HYGIÈNE IT ============ -->
+  <section id="view-hygiene" class="view">
+    <div class="counters">
+      <div class="counter">
+        <div class="label">Agents surveillés</div>
+        <div class="value" id="hyg-c-agents">—</div>
+      </div>
+      <div class="counter">
+        <div class="label">Score moyen</div>
+        <div class="value" id="hyg-c-avgscore">—</div>
+      </div>
+      <div class="counter">
+        <div class="label">Agent le plus exposé</div>
+        <div class="value" id="hyg-c-worst" style="font-size:14px;">—</div>
+      </div>
+      <div class="counter sql">
+        <div class="label">Ports sensibles détectés (parc)</div>
+        <div class="value" id="hyg-c-sensitive">—</div>
+      </div>
+      <div class="counter warn">
+        <div class="label">CVE critiques (parc)</div>
+        <div class="value" id="hyg-c-cve-critical">—</div>
+      </div>
+      <div class="counter tp">
+        <div class="label">CVE hautes (parc)</div>
+        <div class="value" id="hyg-c-cve-high">—</div>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-bottom:16px;">
+      <div class="panel-head">
+        <h2>Agents — triés du plus au moins exposé</h2>
+        <input class="search-input" id="hyg-agents-search" placeholder="Filtrer nom / IP / OS…">
+      </div>
+      <div class="panel-body" style="padding:0;">
+        <div class="table-wrap">
+          <table class="data-table" id="hyg-agents-table">
+            <thead><tr>
+              <th>Score</th><th>Agent</th><th>IP</th><th>OS</th><th>Statut</th>
+              <th>Ports sensibles exposés</th><th>Ports en écoute</th><th>Correctifs</th><th>CVE (critiques / hautes)</th>
+            </tr></thead>
+            <tbody><tr><td colspan="9" class="empty-state">En attente de connexion à l'API Wazuh…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="panel-body" style="padding-top:0;">
+        <div class="sql-note">
+          Score d'hygiène calculé côté ce dashboard (pas un score officiel Wazuh), combinant deux
+          familles de signaux. Heuristique locale : -10 pts par port sensible exposé en écoute
+          (RDP, SMB, bases de données…), -5 pts par port supplémentaire au-delà de 5, -15 pts si
+          agent Windows sans correctif recensé, -25 pts si l'OS est en fin de support connue
+          (Windows 7/2008/2012, CentOS 6/7/8…). CVE réelles (si le module Vulnerability Detector
+          Wazuh est actif côté manager) : -8 pts par CVE critique, -4 par CVE haute, -1 par CVE
+          moyenne (plafonds par catégorie). Le détail de chaque faille est listé dans les onglets
+          "Vulnérabilités" et "CVE (Wazuh)" du détail agent (cliquer une ligne du tableau).
+          Nécessite <code>WAZUH_API_HOST/PORT/USER/PASSWORD</code> configurés côté API (accès à
+          l'API REST du manager Wazuh, port 55000 par défaut) ; le module Vulnerability Detector
+          est optionnel — son absence bascule silencieusement sur l'heuristique locale seule.
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" id="hyg-detail-panel" style="display:none;">
+      <div class="panel-head">
+        <h2 id="hyg-detail-title">Détail agent</h2>
+        <button class="chip" id="hyg-detail-close"><span class="btn-icon" data-icon="close"></span> Fermer</button>
+      </div>
+      <div class="hygiene-tabs">
+        <button class="chip active" data-hygsub="findings">Vulnérabilités</button>
+        <button class="chip" data-hygsub="cves">CVE (Wazuh)</button>
+        <button class="chip" data-hygsub="packages">Logiciels installés</button>
+        <button class="chip" data-hygsub="ports">Ports ouverts</button>
+        <button class="chip" data-hygsub="processes">Processus</button>
+        <button class="chip" data-hygsub="hotfixes">Correctifs</button>
+      </div>
+      <div class="panel-body" style="padding-top:10px;">
+        <input class="search-input" id="hyg-detail-search" placeholder="Filtrer…" style="width:100%; margin-bottom:10px;">
+      </div>
+
+      <div class="hygiene-subview active" id="hygsub-findings">
+        <div class="panel-body" style="padding:0 0 8px;">
+          <div id="hyg-findings-list" class="empty-state">Sélectionne un agent ci-dessus.</div>
+        </div>
+      </div>
+      <div class="hygiene-subview" id="hygsub-cves">
+        <div class="panel-body" style="padding:0 16px 8px;">
+          <div id="hyg-cves-note" class="sql-note" style="display:none; margin-bottom:10px;"></div>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table" id="hyg-cves-table">
+            <thead><tr><th>CVE</th><th>Sévérité</th><th>CVSS</th><th>Paquet</th><th>Version</th><th>Condition</th><th>Publiée le</th></tr></thead>
+            <tbody><tr><td colspan="7" class="empty-state">Sélectionne un agent ci-dessus.</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="hygiene-subview" id="hygsub-packages">
+        <div class="table-wrap">
+          <table class="data-table" id="hyg-packages-table">
+            <thead><tr><th>Nom</th><th>Version</th><th>Architecture</th><th>Fournisseur</th><th>Installé le</th></tr></thead>
+            <tbody><tr><td colspan="5" class="empty-state">Sélectionne un agent ci-dessus.</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="hygiene-subview" id="hygsub-ports">
+        <div class="table-wrap">
+          <table class="data-table" id="hyg-ports-table">
+            <thead><tr><th>Protocole</th><th>Adresse locale</th><th>Port</th><th>État</th><th>Processus</th><th>PID</th></tr></thead>
+            <tbody><tr><td colspan="6" class="empty-state">Sélectionne un agent ci-dessus.</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="hygiene-subview" id="hygsub-processes">
+        <div class="table-wrap">
+          <table class="data-table" id="hyg-processes-table">
+            <thead><tr><th>PID</th><th>Nom</th><th>Utilisateur</th><th>Commande</th><th>Démarré le</th></tr></thead>
+            <tbody><tr><td colspan="5" class="empty-state">Sélectionne un agent ci-dessus.</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="hygiene-subview" id="hygsub-hotfixes">
+        <div class="table-wrap">
+          <table class="data-table" id="hyg-hotfixes-table">
+            <thead><tr><th>Correctif (KB)</th></tr></thead>
+            <tbody><tr><td class="empty-state">Sélectionne un agent ci-dessus (agents Windows uniquement).</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VUE HISTORIQUE CONNEXIONS ADMIN ============ -->
+  <section id="view-auth-history" class="view">
+    <div class="counters">
+      <div class="counter">
+        <div class="label">Tentatives (100 dernières)</div>
+        <div class="value" id="auth-c-total">0</div>
+      </div>
+      <div class="counter tp">
+        <div class="label">Connexions réussies</div>
+        <div class="value" id="auth-c-ok" style="color:var(--ok);">0</div>
+      </div>
+      <div class="counter">
+        <div class="label">Échecs</div>
+        <div class="value" id="auth-c-fail" style="color:var(--tp);">0</div>
+      </div>
+      <div class="counter">
+        <div class="label">Machines distinctes</div>
+        <div class="value" id="auth-c-machines">0</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <h2>Historique des connexions admin</h2>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <input class="search-input" id="auth-history-search" placeholder="Filtrer email / IP / machine…">
+          <button class="chip" id="auth-history-refresh"><span class="btn-icon" data-icon="refresh"></span> Actualiser</button>
+        </div>
+      </div>
+      <div class="panel-body" style="padding:0;">
+        <div class="table-wrap">
+          <table class="data-table" id="auth-history-table">
+            <thead><tr>
+              <th>Horodatage</th><th>Résultat</th><th>Email</th><th>Nom</th><th>IP source</th><th>Machine (DNS inverse)</th><th>Détail</th>
+            </tr></thead>
+            <tbody><tr><td colspan="7" class="empty-state">Chargement…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <p class="hint" style="color:var(--text-dim); font-size:11.5px; margin-top:10px;">
+      Le nom de machine est résolu côté serveur par DNS inverse à partir de l'IP source (fiable sur ce LAN interne avec DNS/AD) —
+      « — » si l'IP n'a pas de PTR configuré. Verrouillage automatique après 5 échecs (mot de passe ou code) pour un même email ou IP (15 min).
+    </p>
+  </section>
+
+</main>
+
+<!-- ---------- MODAL : log complet d'une alerte ---------- -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="modal-title">Détail de l'alerte</h3>
+      <button class="modal-close" id="modal-close">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-section">
+        <h4>Résumé</h4>
+        <div class="kv-grid" id="modal-summary"></div>
+      </div>
+      <div class="modal-section">
+        <h4>Catégorie</h4>
+        <div id="modal-category"></div>
+      </div>
+      <div class="modal-section">
+        <h4>Métadonnées</h4>
+        <div class="kv-grid" id="modal-meta"></div>
+      </div>
+      <div class="modal-section">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+          <h4 style="margin:0;">Log brut (JSON)</h4>
+          <button class="btn copy-btn" id="modal-copy">Copier</button>
+        </div>
+        <pre class="log-block" id="modal-log"></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ---------- AI AGENT PANEL ---------- -->
+<div class="ai-overlay" id="ai-overlay"></div>
+<div class="ai-panel" id="ai-panel">
+  <div class="ai-head">
+    <div class="ai-head-title">
+      <div class="ai-avatar" data-icon="sparkle"></div>
+      <div>
+        <h3>Assistant SOC</h3>
+        <div class="sub">Gemini 3.1 Flash Lite</div>
+      </div>
+    </div>
+    <button class="modal-close" id="ai-close">✕</button>
+  </div>
+  <div class="ai-messages" id="ai-messages">
+    <div class="ai-msg assistant">
+      Bonjour, je peux répondre à des questions sur l'état actuel du SOC (volume d'alertes,
+      taux de faux positifs, agents les plus actifs, tactiques MITRE observées…). Que veux-tu savoir ?
+    </div>
+  </div>
+  <div class="ai-chips">
+    <button class="ai-chip" data-prompt="Résume l'état actuel du SOC en 3 points.">Résumé état actuel</button>
+    <button class="ai-chip" data-prompt="Quelles sont les alertes True Positive les plus critiques en ce moment ?">Alertes critiques</button>
+    <button class="ai-chip" data-prompt="Quel est le taux de faux positifs et est-il anormal ?">Taux de FP</button>
+  </div>
+  <div class="ai-input-row">
+    <textarea class="ai-input" id="ai-input" rows="1" placeholder="Poser une question sur l'état du SOC…"></textarea>
+    <button class="ai-send" id="ai-send">Envoyer</button>
+  </div>
+  <div class="ai-footnote">Réponses générées via l'endpoint backend /ai/ask (proxy Gemini 3.1 Flash Lite).</div>
+</div>
+
+<!-- ---------- TOASTS ---------- -->
+<div class="toast-stack" id="toast-stack" aria-live="polite"></div>
+
+<!-- ---------- COMMAND PALETTE ---------- -->
+<div class="cmdk-overlay" id="cmdk-overlay">
+  <div class="cmdk" id="cmdk" role="dialog" aria-label="Palette de commandes">
+    <div class="cmdk-input-row">
+      <span class="btn-icon" data-icon="search"></span>
+      <input type="text" id="cmdk-input" placeholder="Rechercher une vue ou une action…" autocomplete="off">
+      <span class="cmdk-hint">Échap</span>
+    </div>
+    <div class="cmdk-list" id="cmdk-list"></div>
+  </div>
+</div>
+
+<script>
+const API = "";
+const POLL_MS = 5000;
+const LOG_WINDOW = 150;      // taille de la fenêtre de logs conservée côté client (backend: HISTORY_MAXLEN=500)
+let liveTimer = null;
+let currentAlerts = [];      // dernier lot d'alertes reçu de /alerts/recent
+let activeFilter = 'tp';
+let sparkHistory = [];       // historique du total, pour la sparkline
+let aiHistory = [];          // historique de la conversation IA
+let CATEGORY_META = {};      // slug -> {label, color} chargé depuis /model/categories (une fois)
+
+/* ==================== Icônes SVG (remplace les emoji, rendu cohérent multi-plateforme) ====
+   Set minimal dessiné à la main (18x18, trait 1.6-1.8, currentColor) — zéro dépendance,
+   cohérent avec le reste du projet (pas de librairie d'icônes externe). */
+const ICONS = {
+  sun: '<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="9" cy="9" r="3.2"/><path d="M9 1.5v2M9 14.5v2M2.6 9h2M13.4 9h2M4.4 4.4l1.4 1.4M12.2 12.2l1.4 1.4M4.4 13.6l1.4-1.4M12.2 5.8l1.4-1.4"/></svg>',
+  moon: '<svg viewBox="0 0 18 18" fill="currentColor" stroke="none"><path d="M12.8 2.3a7 7 0 100 13.4A7.8 7.8 0 0112.8 2.3z"/></svg>',
+  sparkle: '<svg viewBox="0 0 18 18" fill="currentColor" stroke="none"><path d="M9 2l1.3 4L14 7l-3.7 1.3L9 12l-1.3-3.7L4 7l3.7-1L9 2z"/><path d="M14.5 11l.5 1.5 1.5.5-1.5.5-.5 1.5-.5-1.5-1.5-.5 1.5-.5z"/></svg>',
+  logout: '<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 2.5H3.8a1 1 0 00-1 1v11a1 1 0 001 1H7"/><path d="M11.5 12.5L15.5 9l-4-3.5"/><path d="M15.5 9H6.5"/></svg>',
+  download: '<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2v9M5.5 8L9 11.5 12.5 8"/><path d="M3 13.5v1a1 1 0 001 1h10a1 1 0 001-1v-1"/></svg>',
+  refresh: '<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 9a5.5 5.5 0 10-1.7 4"/><path d="M14.5 4.5v3.5H11"/></svg>',
+  close: '<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 4l10 10M14 4L4 14"/></svg>',
+  search: '<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="5"/><path d="M15 15l-3.5-3.5"/></svg>',
+  zap: '<svg viewBox="0 0 18 18" fill="currentColor" stroke="none"><path d="M10 1L3 10.5h4.5L8 17l7-9.5h-4.5L10 1z"/></svg>',
+  command: '<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="14" height="10" rx="2"/><path d="M5.5 12v2M12.5 12v2"/></svg>',
+  check: '<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 9.5l3.5 3.5 7.5-8"/></svg>',
+  alert: '<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2.3L1.8 15h14.4L9 2.3z"/><path d="M9 7.2v3.4M9 12.8h.01"/></svg>',
+  chart: '<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 15V7M8 15V3M13 15v-5"/></svg>',
+  flow: '<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="4" height="4" rx="1"/><rect x="12" y="12" width="4" height="4" rx="1"/><path d="M6 4h4a2 2 0 012 2v6"/></svg>',
+  network: '<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="3.5" r="1.8"/><circle cx="3.5" cy="14" r="1.8"/><circle cx="14.5" cy="14" r="1.8"/><path d="M9 5.3L4.5 12.3M9 5.3l4.5 7"/></svg>',
+  database: '<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="9" cy="4" rx="5.5" ry="2"/><path d="M3.5 4v10c0 1.1 2.5 2 5.5 2s5.5-.9 5.5-2V4"/><path d="M3.5 9c0 1.1 2.5 2 5.5 2s5.5-.9 5.5-2"/></svg>',
+  shield: '<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2l6 2.2v4.3c0 4-2.6 6.6-6 7.5-3.4-.9-6-3.5-6-7.5V4.2L9 2z"/></svg>',
+  clock: '<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="6.5"/><path d="M9 5v4l3 2"/></svg>',
+  pause: '<svg viewBox="0 0 18 18" fill="currentColor" stroke="none"><rect x="5" y="3" width="3" height="12" rx="1"/><rect x="10" y="3" width="3" height="12" rx="1"/></svg>',
+  play: '<svg viewBox="0 0 18 18" fill="currentColor" stroke="none"><path d="M5 3l10 6-10 6V3z"/></svg>',
+};
+function paintIcons(root = document){
+  root.querySelectorAll('[data-icon]').forEach(el => {
+    const name = el.getAttribute('data-icon');
+    if (ICONS[name]) el.innerHTML = ICONS[name];
+  });
+}
+document.getElementById('palette-toggle').setAttribute('data-icon', 'command');
+document.getElementById('ai-toggle').setAttribute('data-icon', 'sparkle');
+document.getElementById('logout-btn').setAttribute('data-icon', 'logout');
+document.getElementById('modal-close').setAttribute('data-icon', 'close');
+document.getElementById('ai-close').setAttribute('data-icon', 'close');
+paintIcons();
+
+/* ==================== Session admin ====================
+   Le middleware backend (src/api.py) bloque déjà l'accès à cette page sans session
+   valide (redirection serveur vers /login.html). Cette vérification côté client est
+   une défense en profondeur : si la session expire pendant que la page reste ouverte
+   (onglet laissé ouvert plusieurs heures), les appels /auth/me périodiques détectent
+   la perte de session et renvoient vers /login.html au lieu de laisser le dashboard
+   dans un état incohérent (données figées, erreurs 401 silencieuses en console). */
+async function checkSession(){
+  try {
+    const res = await fetch(API + '/auth/me');
+    if (!res.ok){ window.location.href = '/login.html'; return; }
+    const data = await res.json();
+    document.getElementById('session-label').textContent = data.name || data.email || 'Admin';
+    document.getElementById('session-pill').title = `Connecté : ${data.name} (${data.email})`;
+  } catch(e){
+    window.location.href = '/login.html';
+  }
+}
+document.getElementById('logout-btn').addEventListener('click', async (e) => {
+  e.stopPropagation();
+  try { await fetch(API + '/auth/logout', {method:'POST'}); } catch(e) {}
+  window.location.href = '/login.html';
+});
+
+/* ==================== Historique des connexions admin ==================== */
+let authHistory = [];
+
+async function loadAuthHistory(){
+  const tbody = document.querySelector('#auth-history-table tbody');
+  try {
+    const res = await fetch(API + '/auth/history?limit=100');
+    if (!res.ok) throw new Error('endpoint indisponible');
+    authHistory = await res.json();
+    renderAuthHistory();
+  } catch(e){
+    tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Historique injoignable.</td></tr>';
+  }
+}
+
+function formatAuthTimestamp(iso){
+  if (!iso) return '—';
+  try {
+    return new Date(iso).toLocaleString('fr-FR', {dateStyle:'short', timeStyle:'medium'});
+  } catch(e){ return iso; }
+}
+
+function renderAuthHistory(){
+  const tbody = document.querySelector('#auth-history-table tbody');
+  const q = document.getElementById('auth-history-search').value.trim().toLowerCase();
+
+  const filtered = q
+    ? authHistory.filter(h => [h.email, h.name, h.ip, h.machine_name].some(v => (v || '').toLowerCase().includes(q)))
+    : authHistory;
+
+  const okCount = authHistory.filter(h => h.success).length;
+  const failCount = authHistory.length - okCount;
+  const distinctMachines = new Set(authHistory.map(h => h.machine_name).filter(Boolean)).size;
+  document.getElementById('auth-c-total').textContent = authHistory.length;
+  document.getElementById('auth-c-ok').textContent = okCount;
+  document.getElementById('auth-c-fail').textContent = failCount;
+  document.getElementById('auth-c-machines').textContent = distinctMachines;
+
+  if (!filtered.length){
+    tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Aucune tentative de connexion enregistrée.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(h => `
+    <tr class="${h.success ? 'auth-row-ok' : 'auth-row-fail'}">
+      <td>${escapeText(formatAuthTimestamp(h.created_at))}</td>
+      <td><span class="badge ${h.success ? 'ok' : 'tp'}">${h.success ? 'RÉUSSIE' : 'ÉCHEC'}</span></td>
+      <td>${escapeText(h.email)}</td>
+      <td>${escapeText(h.name)}</td>
+      <td>${escapeText(h.ip)}</td>
+      <td class="auth-machine${h.machine_name ? '' : ' unknown'}">${escapeText(h.machine_name)}</td>
+      <td>${escapeText(h.reason)}</td>
+    </tr>
+  `).join('');
+}
+
+document.getElementById('auth-history-search').addEventListener('input', renderAuthHistory);
+document.getElementById('auth-history-refresh').addEventListener('click', loadAuthHistory);
+
+/* ==================== Catégories de menace ==================== */
+async function loadCategoryMeta(){
+  try {
+    const res = await fetch(API + '/model/categories');
+    if (!res.ok) return;
+    const data = await res.json();
+    CATEGORY_META = data.categories || {};
+  } catch(e) { /* silencieux, les badges retombent sur un style neutre */ }
+}
+
+function catMeta(slug){
+  return CATEGORY_META[slug] || { label: slug || 'Non catégorisé', color: 'text-dim' };
+}
+
+function catBadgeHtml(slug){
+  if (!slug) return '';
+  const meta = catMeta(slug);
+  return `<span class="cat-badge" style="color:var(--${meta.color});"><span class="cat-dot"></span>${escapeHtml(meta.label)}</span>`;
+}
+
+/* ==================== Synchronisation multi-fenêtres (BroadcastChannel) ====================
+   Chaque fenêtre/onglet continue d'interroger l'API indépendamment (comportement inchangé),
+   mais diffuse aussitôt les données reçues aux autres fenêtres/onglets ouverts sur ce même
+   dashboard (même origine), qui les appliquent immédiatement sans re-fetch. Résultat : plusieurs
+   fenêtres (ex. mur d'écrans SOC) restent visuellement synchronisées en quasi temps réel, même
+   si leurs cycles de polling respectifs sont décalés. Le thème clair/sombre est synchronisé de
+   la même manière. Se dégrade proprement (chaque fenêtre reste autonome) si BroadcastChannel
+   n'est pas supporté par le navigateur. */
+const bc = ('BroadcastChannel' in window) ? new BroadcastChannel('soc-dashboard-sync') : null;
+
+function updateSyncPill(){
+  const dot = document.getElementById('sync-dot');
+  const text = document.getElementById('sync-status-text');
+  if (!dot || !text) return;
+  if (bc){
+    dot.className = 'dot online';
+    text.textContent = 'Sync multi-fenêtres active';
+  } else {
+    dot.className = 'dot offline';
+    text.textContent = 'Sync indisponible (navigateur)';
+  }
+}
+
+if (bc){
+  bc.onmessage = (ev) => {
+    const msg = ev.data || {};
+    switch (msg.type){
+      case 'theme': applyTheme(msg.value, false); break;
+      case 'health': applyHealth(msg.online, msg.modelLoaded); break;
+      case 'alerts': currentAlerts = msg.data || []; renderFeed(); renderLogFeed(); seedSocPulse(); break;
+      case 'stats': applyStats(msg.data); break;
+      case 'importance': applyImportance(msg.data, msg.error); break;
+      case 'sqlHealth': applySqlHealth(msg.ok, msg.data); break;
+      case 'sqlSessions': applySqlSessions(msg.data); break;
+      case 'sqlUsers': applySqlUsers(msg.data); break;
+      case 'sqlPermissions': applySqlPermissions(msg.data); break;
+      case 'sqlEvents': applySqlEvents(msg.data); break;
+    }
+  };
+}
+
+/* ==================== Thème ==================== */
+const themeBtn = document.getElementById('theme-toggle');
+function applyTheme(next, broadcast = true){
+  document.body.setAttribute('data-theme', next);
+  themeBtn.innerHTML = ICONS[next === 'dark' ? 'moon' : 'sun'];
+  themeBtn.title = next === 'dark' ? 'Passer en thème clair' : 'Passer en thème sombre';
+  localStorage.setItem('soc-theme', next);
+  if (broadcast) bc?.postMessage({type:'theme', value: next});
+}
+applyTheme(localStorage.getItem('soc-theme') || 'dark', false);
+themeBtn.addEventListener('click', () => {
+  const next = document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  applyTheme(next);
+});
+
+/* ==================== Tabs ==================== */
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('view-' + btn.dataset.view).classList.add('active');
+    if (btn.dataset.view === 'advanced') loadImportance();
+    if (btn.dataset.view === 'states') renderMitreDiagram();
+    if (btn.dataset.view === 'network') renderNetworkView();
+    if (btn.dataset.view === 'sql') refreshSql();
+    if (btn.dataset.view === 'hygiene') loadHygieneOverview();
+    if (btn.dataset.view === 'auth-history') loadAuthHistory();
+  });
+});
+
+/* ==================== Health ==================== */
+function applyHealth(online, modelLoaded){
+  const dot = document.getElementById('api-dot');
+  const text = document.getElementById('api-status-text');
+  if (online){
+    dot.className = 'dot online';
+    text.textContent = modelLoaded ? 'API en ligne' : 'API en ligne (modèle non chargé)';
+  } else {
+    dot.className = 'dot offline';
+    text.textContent = 'API hors ligne';
+  }
+}
+
+async function checkHealth(){
+  try {
+    const res = await fetch(API + '/health');
+    if (!res.ok) throw new Error('bad status');
+    const data = await res.json();
+    applyHealth(true, data.model_loaded);
+    bc?.postMessage({type:'health', online:true, modelLoaded:data.model_loaded});
+  } catch (e) {
+    applyHealth(false, false);
+    bc?.postMessage({type:'health', online:false, modelLoaded:false});
+  }
+}
+
+/* ==================== Filed / feed ==================== */
+function badgeClass(pred){ return pred === 'True Positive' ? 'tp' : 'fp'; }
+
+function severityOf(a){
+  if (typeof a.rule_level === 'number'){
+    if (a.rule_level >= 12) return {label:'Critique', color:'var(--tp)'};
+    if (a.rule_level >= 8)  return {label:'Élevée', color:'var(--warn)'};
+    if (a.rule_level >= 4)  return {label:'Moyenne', color:'var(--accent)'};
+    return {label:'Faible', color:'var(--ok)'};
+  }
+  if (a.confidence >= 0.85) return {label:'Critique', color:'var(--tp)'};
+  if (a.confidence >= 0.6)  return {label:'Élevée', color:'var(--warn)'};
+  return {label:'Faible', color:'var(--ok)'};
+}
+
+/* ==================== Filtres rapides déclenchés par un clic (catégorie / sévérité) ====================
+   Complètent les chips TP/FP/SQL + la recherche texte existants : cliquer un widget dérivé
+   (répartition par catégorie en Vue avancée, répartition sévérité en Triage) doit répondre
+   à "montre-moi CES alertes précisément", pas juste afficher un chiffre inerte. Un seul des
+   deux actif à la fois (se remplacent l'un l'autre) pour garder le bandeau de filtre lisible. */
+let activeCategoryFilter = null;
+let activeSeverityFilter = null;
+
+function setQuickFilter(kind, value, label){
+  activeCategoryFilter = kind === 'category' ? value : null;
+  activeSeverityFilter = kind === 'severity' ? value : null;
+  const banner = document.getElementById('quick-filter-banner');
+  const kindEl = document.getElementById('quick-filter-kind');
+  const labelEl = document.getElementById('quick-filter-label');
+  if (value){
+    banner.style.display = 'flex';
+    kindEl.textContent = kind === 'category' ? 'Filtré par catégorie' : 'Filtré par sévérité';
+    labelEl.textContent = label;
+  } else {
+    banner.style.display = 'none';
+  }
+  renderFeed();
+}
+document.getElementById('quick-filter-clear')?.addEventListener('click', () => setQuickFilter(null, null, ''));
+
+function applyFilters(){
+  const q = document.getElementById('feed-search').value.trim().toLowerCase();
+  const hideResolved = document.getElementById('hide-resolved').checked;
+  return currentAlerts.filter(a => {
+    if (activeFilter === 'tp' && a.prediction !== 'True Positive') return false;
+    if (activeFilter === 'fp' && a.prediction === 'True Positive') return false;
+    if (activeFilter === 'sql' && a.category !== 'sql') return false;
+    if (activeCategoryFilter && a.category !== activeCategoryFilter) return false;
+    if (activeSeverityFilter && severityOf(a).label !== activeSeverityFilter) return false;
+    if (hideResolved && (a.status === 'resolved' || a.status === 'suppressed')) return false;
+    if (q){
+      const hay = `${a.rule_id||''} ${a.rule_description||''} ${a.agent_name||''}`.toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+}
+
+/* ==================== Navigation contextuelle entre pages (clic sur un widget) ==================== */
+function switchToClassificationTab(){
+  const btn = document.querySelector('.tab-btn[data-view="classification"]');
+  if (btn && !btn.classList.contains('active')) btn.click();
+}
+function switchToLogsTab(){
+  const btn = document.querySelector('.tab-btn[data-view="logs"]');
+  if (btn && !btn.classList.contains('active')) btn.click();
+}
+
+/* searchValue : texte injecté dans la recherche du flux ML. filterChip : si fourni, force le
+   chip TP/FP/SQL/Toutes actif (sinon le chip actuel est conservé). */
+function filterClassificationBy(searchValue, filterChip){
+  switchToClassificationTab();
+  activeCategoryFilter = null;
+  activeSeverityFilter = null;
+  const banner = document.getElementById('quick-filter-banner');
+  if (banner) banner.style.display = 'none';
+  if (filterChip){
+    document.querySelectorAll('.chip[data-filter]').forEach(c => c.classList.remove('active'));
+    const chip = document.querySelector(`.chip[data-filter="${filterChip}"]`);
+    if (chip) chip.classList.add('active');
+    activeFilter = filterChip;
+  }
+  document.getElementById('feed-search').value = searchValue || '';
+  renderFeed();
+  document.getElementById('feed')?.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function filterLogsBy(searchValue){
+  switchToLogsTab();
+  document.getElementById('log-search').value = searchValue || '';
+  renderLogFeed(null, true);
+  document.getElementById('log-feed')?.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function renderFeed(flashTimestamp){
+  const feed = document.getElementById('feed');
+  const filtered = applyFilters();
+  if (!filtered.length){
+    feed.innerHTML = '<div class="feed-empty">Aucune alerte ne correspond au flux / filtre actuel.</div>';
+  } else {
+    feed.innerHTML = filtered.map((a) => {
+      const idx = currentAlerts.indexOf(a);
+      const isSql = a.category === 'sql';
+      const isNew = flashTimestamp && a.timestamp === flashTimestamp;
+      const status = a.status || 'new';
+      const priorityColor = {'Critique':'var(--tp)','Élevée':'var(--warn)','Moyenne':'var(--accent)','Faible':'var(--ok)'}[a.priority_label] || 'var(--text-dim)';
+      return `
+      <div class="feed-item${isSql ? ' cat-sql' : ''}${isNew ? ' just-arrived' : ''}${status !== 'new' ? ' status-' + status : ''}" data-idx="${idx}" data-id="${a.id || ''}">
+        <span class="badge ${badgeClass(a.prediction)}">${a.prediction === 'True Positive' ? 'TP' : 'FP'}</span>
+        <div class="feed-desc">
+          <span class="rule">
+            ${a.priority_label ? `<span class="priority-badge" style="color:${priorityColor}; border-color:${priorityColor};" title="Score de priorité : ${a.priority_score}/100">${a.priority_label}</span>` : ''}
+            ${a.is_chain_signal ? `<span class="chain-badge" title="Signal corrélé sur cet agent : ${(a.chain_categories||[]).join(', ')}">⛓ chaîne</span>` : ''}
+            #${a.rule_id ?? '—'} — ${a.rule_description || 'Sans description'}${a.repeat_count > 1 ? `<span class="repeat-badge" title="Répétée ${a.repeat_count} fois depuis ${a.first_seen || a.timestamp}">×${a.repeat_count}</span>` : ''}
+          </span>
+          <span class="meta">${a.agent_name || 'unknown'}${a.timestamp ? ' · ' + a.timestamp : ''} · ${catBadgeHtml(a.category)}${status !== 'new' ? ` · <span class="status-label">${statusLabel(status)}</span>` : ''}</span>
+        </div>
+        <span class="feed-conf">${(a.confidence * 100).toFixed(1)}%</span>
+        <div class="feed-actions">
+          ${status === 'new' ? `<button class="feed-action-btn" data-action="acknowledged" title="Marquer comme vu">Vu</button>` : ''}
+          ${status !== 'resolved' && status !== 'suppressed' ? `<button class="feed-action-btn" data-action="resolved" title="Marquer comme résolu">Résolu</button>` : ''}
+          ${status !== 'suppressed' ? `<button class="feed-action-btn" data-action="suppress" title="Ignorer cette règle sur cet agent à l'avenir">Ignorer</button>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+    feed.querySelectorAll('.feed-item').forEach(el => {
+      el.addEventListener('click', (e) => {
+        if (e.target.closest('.feed-action-btn')) return;
+        openAlertModal(currentAlerts[parseInt(el.dataset.idx, 10)]);
+      });
+      el.querySelectorAll('.feed-action-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const alertId = el.dataset.id;
+          const action = btn.dataset.action;
+          if (action === 'suppress') suppressAlert(alertId);
+          else setAlertStatus(alertId, action);
+        });
+      });
+    });
+  }
+  renderPriorityNow(filtered);
+  renderChainAlerts(filtered);
+  renderTopAgents(filtered, 'top-agents', (name) => filterClassificationBy(name, null));
+  renderTopRules(filtered, 'top-rules', (ruleId) => filterClassificationBy(ruleId, null));
+  renderSeverityDist(filtered);
+  updateUnresolvedCount();
+
+  // Actualise en direct les vues dépendant des mêmes données si elles sont affichées à l'écran.
+  const activeViewId = document.querySelector('.view.active')?.id;
+  if (activeViewId === 'view-network') renderNetworkView();
+  if (activeViewId === 'view-states') renderMitreDiagram();
+}
+
+function statusLabel(status){
+  return {new:'Nouveau', acknowledged:'Vu', resolved:'Résolu', suppressed:'Ignoré'}[status] || status;
+}
+
+async function setAlertStatus(alertId, status){
+  if (!alertId) return;
+  try {
+    const res = await fetch(`${API}/alerts/${alertId}/status`, {
+      method: 'POST', headers: {'Content-Type':'application/json'}, credentials: 'include',
+      body: JSON.stringify({status}),
+    });
+    if (!res.ok) return;
+    const entry = currentAlerts.find(a => a.id === alertId);
+    if (entry) entry.status = status;
+    renderFeed();
+  } catch(e){ /* API probablement hors ligne, silencieux */ }
+}
+
+async function suppressAlert(alertId){
+  if (!alertId) return;
+  try {
+    const res = await fetch(`${API}/alerts/${alertId}/suppress`, { method: 'POST', credentials: 'include' });
+    if (!res.ok) return;
+    const entry = currentAlerts.find(a => a.id === alertId);
+    if (entry) entry.status = 'suppressed';
+    renderFeed();
+  } catch(e){ /* API probablement hors ligne, silencieux */ }
+}
+
+function updateUnresolvedCount(){
+  const n = currentAlerts.filter(a => (a.status || 'new') === 'new' && a.prediction === 'True Positive').length;
+  const el = document.getElementById('c-unresolved');
+  if (el) el.textContent = n;
+}
+
+function renderPriorityNow(list){
+  const el = document.getElementById('priority-now');
+  const top = list.filter(a => (a.status||'new') !== 'resolved' && (a.status||'new') !== 'suppressed')
+    .slice().sort((a,b) => (b.priority_score||0) - (a.priority_score||0)).slice(0,5);
+  if (!top.length){ el.innerHTML = '<div class="empty-state" style="padding:10px 0;">Pas encore de données.</div>'; return; }
+  const colors = {'Critique':'var(--tp)','Élevée':'var(--warn)','Moyenne':'var(--accent)','Faible':'var(--ok)'};
+  el.innerHTML = top.map(a => `
+    <div class="mini-bar-row clickable-row" data-idx="${currentAlerts.indexOf(a)}" title="Cliquer pour voir le détail de cette alerte">
+      <span class="name">#${a.rule_id ?? '—'} · ${a.agent_name || 'unknown'}</span>
+      <div class="mini-track"><div class="mini-fill" style="width:${a.priority_score||0}%; background:${colors[a.priority_label]||'var(--text-dim)'};"></div></div>
+      <span class="cnt">${a.priority_score ?? 0}</span>
+    </div>`).join('');
+  el.querySelectorAll('.clickable-row').forEach(row => {
+    row.addEventListener('click', () => openAlertModal(currentAlerts[parseInt(row.dataset.idx, 10)]));
+  });
+}
+
+function renderChainAlerts(list){
+  const el = document.getElementById('chain-alerts');
+  const chains = {};
+  list.filter(a => a.is_chain_signal).forEach(a => {
+    const agent = a.agent_name || 'unknown';
+    if (!chains[agent]) chains[agent] = new Set();
+    (a.chain_categories||[]).forEach(c => chains[agent].add(c));
+  });
+  const entries = Object.entries(chains);
+  if (!entries.length){ el.innerHTML = '<div class="empty-state" style="padding:10px 0;">Aucun signal corrélé pour l\'instant.</div>'; return; }
+  el.innerHTML = entries.map(([agent, cats]) => `
+    <div class="chain-row clickable-row" data-agent="${escapeHtml(agent)}" title="Cliquer pour filtrer le flux sur cet agent">
+      <span class="name">${agent}</span>
+      <span class="cats">${[...cats].map(c => catBadgeHtml(c)).join(' ')}</span>
+    </div>`).join('');
+  el.querySelectorAll('.clickable-row').forEach(row => {
+    row.addEventListener('click', () => filterClassificationBy(row.dataset.agent, 'all'));
+  });
+}
+
+document.querySelectorAll('.chip[data-filter]').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('.chip[data-filter]').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    activeFilter = chip.dataset.filter;
+    renderFeed();
+  });
+});
+document.getElementById('feed-search').addEventListener('input', renderFeed);
+document.getElementById('hide-resolved').addEventListener('change', renderFeed);
+
+/* Compteurs de la page Classification : chacun est un raccourci vers le filtre qu'il chiffre,
+   pour répondre à "montre-moi CES alertes" plutôt que d'afficher un chiffre inerte. */
+document.querySelectorAll('.counter-clickable').forEach(el => {
+  el.addEventListener('click', () => {
+    const kind = el.dataset.counterFilter;
+    // Un compteur repart toujours d'un filtre catégorie/sévérité propre (pas de renderFeed()
+    // intermédiaire ici : le renderFeed() en fin de handler suffit).
+    activeCategoryFilter = null;
+    activeSeverityFilter = null;
+    const banner = document.getElementById('quick-filter-banner');
+    if (banner) banner.style.display = 'none';
+    document.getElementById('feed-search').value = '';
+    if (kind === 'unresolved'){
+      document.querySelectorAll('.chip[data-filter]').forEach(c => c.classList.remove('active'));
+      document.querySelector('.chip[data-filter="tp"]')?.classList.add('active');
+      activeFilter = 'tp';
+      document.getElementById('hide-resolved').checked = true;
+    } else {
+      document.querySelectorAll('.chip[data-filter]').forEach(c => c.classList.remove('active'));
+      document.querySelector(`.chip[data-filter="${kind}"]`)?.classList.add('active');
+      activeFilter = kind;
+    }
+    renderFeed();
+    document.getElementById('feed')?.scrollIntoView({behavior:'smooth', block:'start'});
+  });
+});
+
+async function loadFeed(){
+  try {
+    const res = await fetch(API + `/alerts/recent?limit=${LOG_WINDOW}`);
+    if (!res.ok) return;
+    currentAlerts = await res.json();
+    renderFeed();
+    renderLogFeed();
+    seedSocPulse();
+    bc?.postMessage({type:'alerts', data: currentAlerts});
+  } catch(e){ /* API probablement hors ligne, silencieux */ }
+}
+
+/* ==================== Logs Wazuh — flux brut (fenêtre dédiée) ====================
+   Vue "tail -f" du même flux que la classification ML, mais sans verdict ni filtre TP/FP :
+   objectif = remplacer la consultation directe de l'agent Wazuh/Kibana pour lire les logs
+   bruts. Filtrable par sévérité (rule.level) et par texte (règle / agent / IP), tri
+   anti-chronologique comme le flux ML.
+
+   Pause : un analyste qui inspecte une ligne ne doit pas voir le flux défiler sous ses yeux.
+   "Pause" fige un instantané (logFeedSnapshot) pris au moment du clic ; les alertes qui
+   continuent d'arriver en tâche de fond sont comptées (logStreamPendingCount) mais pas
+   rendues tant que "Reprendre" n'est pas cliqué — à ce moment on revient sur currentAlerts
+   (déjà à jour) et on vide le compteur. */
+let activeLogSeverity = '';
+let logStreamPaused = false;
+let logStreamPendingCount = 0;
+let logFeedSnapshot = null;
+
+function getLogFeedSource(){
+  return (logStreamPaused && logFeedSnapshot) ? logFeedSnapshot : currentAlerts;
+}
+
+function filterLogList(source){
+  const q = (document.getElementById('log-search')?.value || '').trim().toLowerCase();
+  let list = source;
+  if (activeLogSeverity) list = list.filter(a => severityOf(a).label === activeLogSeverity);
+  if (q) list = list.filter(a => `${a.rule_id||''} ${a.rule_description||''} ${a.agent_name||''} ${a.srcip||''} ${a.dstip||''}`.toLowerCase().includes(q));
+  return list;
+}
+
+function updateLogPauseBadge(){
+  const badge = document.getElementById('log-pause-badge');
+  if (!badge) return;
+  if (logStreamPaused && logStreamPendingCount > 0){
+    badge.style.display = 'inline-flex';
+    badge.textContent = `+${logStreamPendingCount} en attente`;
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+function setLogStreamPaused(paused){
+  logStreamPaused = paused;
+  logFeedSnapshot = paused ? currentAlerts.slice() : null;
+  if (!paused) logStreamPendingCount = 0;
+  const btn = document.getElementById('btn-log-pause');
+  if (btn){
+    btn.classList.toggle('active', paused);
+    btn.innerHTML = paused
+      ? '<span class="btn-icon" data-icon="play"></span> Reprendre'
+      : '<span class="btn-icon" data-icon="pause"></span> Pause';
+    paintIcons(btn);
+  }
+  updateLogPauseBadge();
+  renderLogFeed(null, true);
+}
+document.getElementById('btn-log-pause')?.addEventListener('click', () => setLogStreamPaused(!logStreamPaused));
+
+document.querySelectorAll('#log-sev-filter .chip[data-sev]').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('#log-sev-filter .chip[data-sev]').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    activeLogSeverity = chip.dataset.sev;
+    renderLogFeed(null, true);
+  });
+});
+
+function renderLogFeed(flashTimestamp, force){
+  const feed = document.getElementById('log-feed');
+  if (!feed) return;
+  if (logStreamPaused && !force){
+    logStreamPendingCount++;
+    updateLogPauseBadge();
+    return;
+  }
+  const list = filterLogList(getLogFeedSource());
+
+  if (!list.length){
+    feed.innerHTML = '<div class="feed-empty">Aucun log Wazuh ne correspond au filtre actuel.</div>';
+  } else {
+    feed.innerHTML = list.map((a, idx) => {
+      const isNew = flashTimestamp && a.timestamp === flashTimestamp;
+      const sev = severityOf(a);
+      const groups = a.rule_groups ? a.rule_groups.split(',').slice(0, 3).join(',') : null;
+      const mitre = a.rule_mitre_id ? `mitre=${a.rule_mitre_id} ` : '';
+      return `
+      <div class="log-line${isNew ? ' just-arrived' : ''}" style="border-left-color:${sev.color};" data-idx="${idx}">
+        <span class="log-ts">${escapeHtml(a.timestamp || '—')}</span>
+        <span class="log-agent">${escapeHtml(a.agent_name || 'unknown')}</span>
+        <span class="log-sev-badge" style="color:${sev.color};">${sev.label}</span>
+        <span class="log-rule">rule=${escapeHtml(a.rule_id ?? '—')}(lvl ${a.rule_level ?? '—'})</span>
+        <span class="log-desc">${escapeHtml(a.rule_description || 'Sans description')}${a.repeat_count > 1 ? ` [x${a.repeat_count}]` : ''}</span>
+        <span class="log-extra">${groups ? `groups=${escapeHtml(groups)} ` : ''}${mitre}${a.srcip ? `srcip=${escapeHtml(a.srcip)} ` : ''}${a.dstip ? `dstip=${escapeHtml(a.dstip)}` : ''}</span>
+      </div>`;
+    }).join('') + (logStreamPaused
+      ? '<div class="log-cursor paused">⏸ flux en pause — cliquer « Reprendre » pour continuer</div>'
+      : '<div class="log-cursor">█ en écoute…</div>');
+
+    feed.querySelectorAll('.log-line').forEach(el => {
+      el.addEventListener('click', () => {
+        const item = list[parseInt(el.dataset.idx, 10)];
+        if (item) openAlertModal(item);
+      });
+    });
+  }
+
+  const totalEl = document.getElementById('log-c-total');
+  const agentsEl = document.getElementById('log-c-agents');
+  const rulesEl = document.getElementById('log-c-rules');
+  const rateEl = document.getElementById('log-c-rate');
+  if (totalEl) totalEl.textContent = list.length;
+  if (agentsEl) agentsEl.textContent = new Set(list.map(a => a.agent_name || 'unknown')).size;
+  if (rulesEl) rulesEl.textContent = new Set(list.map(a => a.rule_id ?? '—')).size;
+  if (rateEl) rateEl.textContent = (latestStats?.alerts_per_min ?? 0).toFixed(1);
+
+  renderTopAgents(list, 'log-top-agents', (name) => filterLogsBy(name));
+  renderTopRules(list, 'log-top-rules', (ruleId) => filterLogsBy(ruleId));
+}
+document.getElementById('log-search')?.addEventListener('input', () => renderLogFeed(null, true));
+
+document.getElementById('btn-export-logs')?.addEventListener('click', () => {
+  const list = filterLogList(getLogFeedSource());
+  const blob = new Blob([JSON.stringify(list, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `wazuh_logs_${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.json`;
+  link.click();
+  URL.revokeObjectURL(url);
+});
+
+/* ==================== Pouls du SOC (widget créatif, temps réel) ====================
+   Donne un signal immédiat "le flux Wazuh est-il vivant ?" sans lire de chiffres : un point
+   qui pulse tant que la dernière alerte reçue date de moins de 30s, passe orange puis rouge
+   si le silence se prolonge (utile pour repérer un agent Wazuh déconnecté ou un pipeline en
+   panne). Alimenté par le flux SSE (temps réel) et, en repli, par le polling /alerts/recent. */
+let lastAlertAt = null;
+let lastAlertDetail = null;
+
+function markAlertSeen(alert){
+  lastAlertAt = new Date();
+  lastAlertDetail = alert;
+  tickSocPulse();
+}
+
+function seedSocPulse(){
+  if (lastAlertAt || !currentAlerts.length) return;
+  const first = currentAlerts[0];
+  const parsed = first.timestamp ? new Date(first.timestamp) : null;
+  lastAlertAt = (parsed && !isNaN(parsed)) ? parsed : new Date();
+  lastAlertDetail = first;
+  tickSocPulse();
+}
+
+function formatElapsed(totalSecs){
+  const secs = Math.max(0, Math.round(totalSecs));
+  if (secs < 60) return `${secs}s`;
+  const m = Math.floor(secs / 60), s = secs % 60;
+  if (m < 60) return `${m}min ${s}s`;
+  const h = Math.floor(m / 60);
+  return `${h}h ${m % 60}min`;
+}
+
+function tickSocPulse(){
+  const dot = document.getElementById('pulse-dot');
+  const main = document.getElementById('pulse-elapsed');
+  const sub = document.getElementById('pulse-detail');
+  if (!dot || !main || !sub) return;
+  if (!lastAlertAt){
+    dot.className = 'pulse-dot';
+    main.textContent = 'En attente de la première alerte…';
+    sub.textContent = '—';
+    return;
+  }
+  const secs = (Date.now() - lastAlertAt.getTime()) / 1000;
+  dot.className = 'pulse-dot ' + (secs < 30 ? 'pulse-fresh' : secs < 120 ? 'pulse-warn' : 'pulse-stale');
+  main.textContent = secs < 4 ? 'Alerte à l\'instant' : `Dernière alerte il y a ${formatElapsed(secs)}`;
+  sub.textContent = lastAlertDetail
+    ? `${lastAlertDetail.agent_name || 'agent inconnu'} · #${lastAlertDetail.rule_id ?? '—'} — ${lastAlertDetail.rule_description || 'sans description'}`
+    : '—';
+}
+setInterval(tickSocPulse, 1000);
+
+/* ==================== Top règles déclenchées (widget créatif) ====================
+   Comme renderTopAgents ci-dessus : elId/onClick réutilisés à l'identique par les pages
+   Logs Wazuh et Classification ML. */
+function renderTopRules(list, elId = 'top-rules', onClick){
+  const el = document.getElementById(elId);
+  if (!el) return;
+  if (!list.length){ el.innerHTML = '<div class="empty-state" style="padding:10px 0;">Pas encore de données.</div>'; return; }
+  const counts = {};
+  list.forEach(a => {
+    const key = String(a.rule_id ?? '—');
+    if (!counts[key]) counts[key] = { n: 0, desc: a.rule_description || 'Sans description' };
+    counts[key].n++;
+  });
+  const top = Object.entries(counts).sort((a, b) => b[1].n - a[1].n).slice(0, 5);
+  const max = top[0][1].n;
+  el.innerHTML = top.map(([id, v]) => `
+    <div class="mini-bar-row${onClick ? ' clickable-row' : ''}" data-rule="${escapeHtml(id)}"${onClick ? ` title="Cliquer pour filtrer sur la règle #${escapeHtml(id)}"` : ''}>
+      <span class="name" title="#${escapeHtml(id)} — ${escapeHtml(v.desc)}">#${escapeHtml(id)} ${escapeHtml(v.desc)}</span>
+      <div class="mini-track"><div class="mini-fill" style="width:${(v.n/max*100).toFixed(0)}%; background:var(--warn);"></div></div>
+      <span class="cnt">${v.n}</span>
+    </div>`).join('');
+  if (onClick) el.querySelectorAll('.clickable-row').forEach(row => row.addEventListener('click', () => onClick(row.dataset.rule)));
+}
+
+/* ==================== Toasts ==================== */
+function showToast({title, msg, kind = 'info', duration = 6000}){
+  const stack = document.getElementById('toast-stack');
+  const el = document.createElement('div');
+  el.className = `toast ${kind}`;
+  const iconName = kind === 'tp' ? 'alert' : kind === 'ok' ? 'check' : kind === 'warn' ? 'alert' : 'sparkle';
+  el.innerHTML = `
+    <span class="toast-icon">${ICONS[iconName]}</span>
+    <div class="toast-body">
+      <div class="toast-title">${escapeHtml(title)}</div>
+      ${msg ? `<div class="toast-msg">${escapeHtml(msg)}</div>` : ''}
+    </div>
+    <button class="toast-close" aria-label="Fermer">${ICONS.close}</button>`;
+  const remove = () => {
+    el.classList.add('leaving');
+    setTimeout(() => el.remove(), 200);
+  };
+  el.querySelector('.toast-close').addEventListener('click', remove);
+  stack.appendChild(el);
+  if (duration) setTimeout(remove, duration);
+}
+
+/* ==================== Flux temps réel (Server-Sent Events) ====================
+   Remplace le besoin d'attendre le prochain cycle de polling (5s) pour voir apparaître une
+   nouvelle alerte dans les pages Logs Wazuh / Classification ML : /events/stream pousse chaque prédiction dès qu'elle est
+   traitée par /predict ou /simulate. Le polling existant (refreshAll toutes les 5s) reste
+   actif en parallèle comme filet de sécurité — il réconcilie l'état complet si un événement a
+   été manqué (ex: connexion SSE momentanément coupée) et reste la seule source pour les vues
+   sans événement dédié (SQL Server, Hygiène IT). En cas d'échec de connexion (proxy qui ne
+   supporte pas SSE, navigateur ancien), l'app continue de fonctionner normalement via le
+   polling seul — dégradation silencieuse, pas de fonctionnalité perdue. */
+let eventSource = null;
+let sseRetryTimer = null;
+
+function setPushStatus(state){
+  const pill = document.getElementById('push-pill');
+  const text = document.getElementById('push-status-text');
+  pill.classList.remove('state-live', 'state-fallback');
+  if (state === 'live'){
+    pill.classList.add('state-live');
+    text.textContent = 'Push temps réel';
+  } else if (state === 'fallback'){
+    pill.classList.add('state-fallback');
+    text.textContent = 'Polling (secours)';
+  } else {
+    text.textContent = 'Connexion…';
+  }
+}
+
+function connectEventStream(){
+  if (!('EventSource' in window)){ setPushStatus('fallback'); return; }
+  if (eventSource) eventSource.close();
+
+  eventSource = new EventSource(API + '/events/stream', { withCredentials: true });
+
+  eventSource.onopen = () => setPushStatus('live');
+  eventSource.onerror = () => {
+    // EventSource retente nativement la connexion ; on affiche juste l'état "secours" pendant
+    // la coupure au lieu de fermer/recréer manuellement (évite une boucle de reconnexion en double).
+    setPushStatus('fallback');
+  };
+
+  eventSource.addEventListener('alert', (e) => {
+    let alert;
+    try { alert = JSON.parse(e.data); } catch(err){ return; }
+
+    // Une alerte répétée (même id, voir src/api.py::_active_alert_groups) met à jour
+    // l'entrée existante et la remonte en tête au lieu d'ajouter une nouvelle ligne —
+    // c'est ce qui fait fonctionner le badge "×N" du flux.
+    const existingIdx = alert.id ? currentAlerts.findIndex(a => a.id === alert.id) : -1;
+    if (existingIdx !== -1){
+      currentAlerts.splice(existingIdx, 1);
+      currentAlerts.unshift(alert);
+      renderFeed(alert.timestamp);
+      renderLogFeed(alert.timestamp);
+      markAlertSeen(alert);
+      bc?.postMessage({type:'alerts', data: currentAlerts});
+    } else if (currentAlerts[0]?.timestamp !== alert.timestamp){
+      currentAlerts.unshift(alert);
+      if (currentAlerts.length > LOG_WINDOW) currentAlerts.length = LOG_WINDOW;
+      renderFeed(alert.timestamp);
+      renderLogFeed(alert.timestamp);
+      markAlertSeen(alert);
+      bc?.postMessage({type:'alerts', data: currentAlerts});
+    }
+
+    // Le triage "cette occurrence mérite-t-elle de déranger un analyste" est décidé côté
+    // serveur (src/api.py::_classify, champ should_notify) à partir du score de priorité
+    // composite et de l'historique du groupe (nouvel incident, ou aggravation d'un incident
+    // déjà en cours) — pas ici. Le dashboard se contente d'afficher ce que le triage a décidé.
+    if (alert.should_notify){
+      showToast({
+        title: `Nouvelle alerte ${alert.priority_label.toLowerCase()} — #${alert.rule_id ?? '—'}`,
+        msg: `${alert.rule_description || 'Sans description'} · ${alert.agent_name || 'agent inconnu'}`,
+        kind: alert.priority_label === 'Critique' ? 'tp' : 'warn',
+      });
+    }
+  });
+
+  eventSource.addEventListener('stats', () => {
+    // Le payload "stats" de l'event n'est qu'un signal ("quelque chose a changé") : les champs
+    // dérivés (débit, confiance moyenne) restent calculés côté serveur par /stats, on le
+    // réinterroge donc plutôt que de dupliquer ce calcul en JS.
+    loadStats();
+  });
+}
+
+window.addEventListener('beforeunload', () => { eventSource?.close(); });
+
+/* ==================== Topologie réseau (agents <-> IP) ==================== */
+let topoPositions = {}; // id -> {x, y, vx, vy}, persiste entre rafraîchissements pour stabiliser la mise en page
+
+function buildTopologyGraph(alerts){
+  const nodes = new Map(); // id -> {id, type, label, count, tp, fp}
+  const edges = new Map(); // "a|b" -> {a, b, count, tp, fp}
+
+  const touchNode = (id, type, label) => {
+    if (!nodes.has(id)) nodes.set(id, {id, type, label, count:0, tp:0, fp:0});
+    return nodes.get(id);
+  };
+  const touchEdge = (a, b, isTp) => {
+    const key = a < b ? `${a}|${b}` : `${b}|${a}`;
+    if (!edges.has(key)) edges.set(key, {a, b, count:0, tp:0, fp:0});
+    const e = edges.get(key);
+    e.count++;
+    if (isTp) e.tp++; else e.fp++;
+    return e;
+  };
+
+  alerts.forEach(al => {
+    const isTp = al.prediction === 'True Positive';
+    const agentId = `agent:${al.agent_name || 'unknown'}`;
+    const agentNode = touchNode(agentId, 'agent', al.agent_name || 'unknown');
+    agentNode.count++;
+    if (isTp) agentNode.tp++; else agentNode.fp++;
+
+    [al.srcip, al.dstip].forEach(ip => {
+      if (!ip) return;
+      const ipId = `ip:${ip}`;
+      const ipNode = touchNode(ipId, 'ip', ip);
+      ipNode.count++;
+      if (isTp) ipNode.tp++; else ipNode.fp++;
+      touchEdge(agentId, ipId, isTp);
+    });
+  });
+
+  return { nodes: [...nodes.values()], edges: [...edges.values()] };
+}
+
+function layoutTopology(nodes, edges, w, h){
+  const liveIds = new Set(nodes.map(n => n.id));
+  Object.keys(topoPositions).forEach(id => { if (!liveIds.has(id)) delete topoPositions[id]; });
+
+  nodes.forEach(n => {
+    if (!topoPositions[n.id]){
+      topoPositions[n.id] = { x: w/2 + (Math.random()-0.5)*80, y: h/2 + (Math.random()-0.5)*80, vx:0, vy:0 };
+    }
+  });
+
+  const pos = topoPositions;
+  const iterations = nodes.length > 1 ? 150 : 0;
+  for (let it = 0; it < iterations; it++){
+    // répulsion entre tous les nœuds (charge négative)
+    for (let i = 0; i < nodes.length; i++){
+      for (let j = i+1; j < nodes.length; j++){
+        const a = pos[nodes[i].id], b = pos[nodes[j].id];
+        const dx = a.x - b.x, dy = a.y - b.y;
+        const dist2 = Math.max(dx*dx + dy*dy, 1);
+        const dist = Math.sqrt(dist2);
+        const force = 900 / dist2;
+        const fx = (dx/dist) * force, fy = (dy/dist) * force;
+        a.vx += fx; a.vy += fy;
+        b.vx -= fx; b.vy -= fy;
+      }
+    }
+    // attraction ressort le long des arêtes
+    edges.forEach(e => {
+      const a = pos[e.a], b = pos[e.b];
+      const dx = b.x - a.x, dy = b.y - a.y;
+      const dist = Math.max(Math.sqrt(dx*dx + dy*dy), 1);
+      const force = (dist - 90) * 0.02;
+      const fx = (dx/dist) * force, fy = (dy/dist) * force;
+      a.vx += fx; a.vy += fy;
+      b.vx -= fx; b.vy -= fy;
+    });
+    // recentrage doux + intégration + amortissement
+    nodes.forEach(n => {
+      const p = pos[n.id];
+      p.vx += (w/2 - p.x) * 0.001;
+      p.vy += (h/2 - p.y) * 0.001;
+      p.vx *= 0.82; p.vy *= 0.82;
+      p.x += p.vx; p.y += p.vy;
+      p.x = Math.max(30, Math.min(w-30, p.x));
+      p.y = Math.max(30, Math.min(h-30, p.y));
+    });
+  }
+}
+
+function renderTopologyGraph(){
+  const svg = document.getElementById('topo-graph');
+  if (!svg) return;
+  const w = 720, h = 420;
+  if (!currentAlerts.length){
+    svg.innerHTML = `<text x="${w/2}" y="${h/2}" text-anchor="middle" font-family="var(--mono)" font-size="12" fill="var(--text-dim)">En attente d'alertes…</text>`;
+    return;
+  }
+  const { nodes, edges } = buildTopologyGraph(currentAlerts);
+  layoutTopology(nodes, edges, w, h);
+  const pos = topoPositions;
+  const maxCount = Math.max(...nodes.map(n => n.count), 1);
+
+  const edgeLines = edges.map(e => {
+    const a = pos[e.a], b = pos[e.b];
+    const color = (e.tp / e.count) > 0.5 ? 'var(--tp)' : 'var(--ok)';
+    const width = 1 + Math.min(e.count, 8) * 0.6;
+    return `<line x1="${a.x.toFixed(1)}" y1="${a.y.toFixed(1)}" x2="${b.x.toFixed(1)}" y2="${b.y.toFixed(1)}" stroke="${color}" stroke-width="${width.toFixed(1)}" opacity="0.35"/>`;
+  }).join('');
+
+  const nodeShapes = nodes.map(n => {
+    const p = pos[n.id];
+    const r = 8 + (n.count / maxCount) * 14;
+    let fill;
+    if (n.type === 'agent') fill = 'var(--accent)';
+    else fill = (n.tp / n.count) > 0.5 ? 'var(--tp)' : 'var(--ok)';
+    const label = n.label.length > 16 ? n.label.slice(0,14) + '…' : n.label;
+    return `
+      <g class="topo-node" data-node-id="${escapeHtml(n.id)}" data-node-label="${escapeHtml(n.label)}" style="cursor:pointer;">
+        <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${r.toFixed(1)}" fill="${fill}" opacity="${n.type==='agent' ? 0.85 : 0.75}" stroke="${fill}" stroke-width="1.5"/>
+        <text x="${p.x.toFixed(1)}" y="${(p.y + r + 12).toFixed(1)}" text-anchor="middle" class="topo-node-label">${escapeHtml(label)}</text>
+        <title>${escapeHtml(n.label)} — ${n.count} alerte(s), ${n.tp} TP / ${n.fp} FP</title>
+      </g>`;
+  }).join('');
+
+  svg.innerHTML = edgeLines + nodeShapes;
+  svg.querySelectorAll('.topo-node').forEach(el => {
+    el.addEventListener('click', () => {
+      const id = el.dataset.nodeId;
+      const label = el.dataset.nodeLabel;
+      if (id.startsWith('ip:')){
+        filterClassificationBy(label, 'all');
+      } else if (id.startsWith('agent:')){
+        filterClassificationBy(label, 'all');
+      }
+    });
+  });
+}
+
+/* ==================== IP sources à risque ==================== */
+function renderIpRiskList(){
+  const el = document.getElementById('ip-risk-list');
+  if (!el) return;
+  const counts = {};
+  currentAlerts.forEach(a => {
+    const ip = a.srcip;
+    if (!ip) return;
+    if (!counts[ip]) counts[ip] = { ip, count:0, tp:0, fp:0, maxLevel:0, maxConfidence:0 };
+    const c = counts[ip];
+    c.count++;
+    if (a.prediction === 'True Positive') c.tp++; else c.fp++;
+    if (typeof a.rule_level === 'number') c.maxLevel = Math.max(c.maxLevel, a.rule_level);
+    c.maxConfidence = Math.max(c.maxConfidence, a.confidence || 0);
+  });
+  const list = Object.values(counts).sort((a,b) => b.count - a.count || b.maxConfidence - a.maxConfidence).slice(0, 15);
+  if (!list.length){
+    el.innerHTML = '<div class="empty-state">Aucune IP source observée dans la fenêtre affichée.</div>';
+    return;
+  }
+  el.innerHTML = list.map((c, i) => `
+    <div class="ip-risk-row" data-ip="${escapeHtml(c.ip)}">
+      <span class="rank">${i+1}</span>
+      <div>
+        <div class="ip">${escapeHtml(c.ip)}</div>
+        <div class="meta">${c.tp} TP · ${c.fp} FP · sévérité max ${c.maxLevel} · confiance max ${(c.maxConfidence*100).toFixed(0)}%</div>
+      </div>
+      <span class="badge ${c.tp >= c.fp ? 'tp' : 'fp'}">${c.tp >= c.fp ? 'TP' : 'FP'}</span>
+      <span class="cnt">${c.count}</span>
+    </div>`).join('');
+  el.querySelectorAll('.ip-risk-row').forEach(row => {
+    row.addEventListener('click', () => filterClassificationBy(row.dataset.ip, 'all'));
+  });
+}
+
+function renderNetworkView(){
+  renderTopologyGraph();
+  renderIpRiskList();
+}
+document.getElementById('topo-reset')?.addEventListener('click', () => {
+  topoPositions = {};
+  renderTopologyGraph();
+});
+
+/* ==================== Top agents / sévérité (mini widgets) ==================== */
+/* elId/onClick optionnels : réutilisée telle quelle par la page Logs (agents les plus bruyants,
+   filtre sur le flux brut) et par la page Classification (agents les plus actifs, filtre sur le
+   flux ML) avec deux cibles DOM et deux comportements de clic distincts. */
+function renderTopAgents(list, elId = 'top-agents', onClick){
+  const el = document.getElementById(elId);
+  if (!el) return;
+  if (!list.length){ el.innerHTML = '<div class="empty-state" style="padding:10px 0;">Pas encore de données.</div>'; return; }
+  const counts = {};
+  list.forEach(a => { const name = a.agent_name || 'unknown'; counts[name] = (counts[name]||0)+1; });
+  const top = Object.entries(counts).sort((a,b) => b[1]-a[1]).slice(0,5);
+  const max = top[0][1];
+  el.innerHTML = top.map(([name, n]) => `
+    <div class="mini-bar-row${onClick ? ' clickable-row' : ''}" data-agent="${escapeHtml(name)}"${onClick ? ' title="Cliquer pour filtrer sur cet agent"' : ''}>
+      <span class="name">${escapeHtml(name)}</span>
+      <div class="mini-track"><div class="mini-fill" style="width:${(n/max*100).toFixed(0)}%; background:var(--accent);"></div></div>
+      <span class="cnt">${n}</span>
+    </div>`).join('');
+  if (onClick) el.querySelectorAll('.clickable-row').forEach(row => row.addEventListener('click', () => onClick(row.dataset.agent)));
+}
+
+function renderSeverityDist(list){
+  const el = document.getElementById('severity-dist');
+  if (!list.length){ el.innerHTML = '<div class="empty-state" style="padding:10px 0;">Pas encore de données.</div>'; return; }
+  const buckets = {'Critique':0,'Élevée':0,'Moyenne':0,'Faible':0};
+  const colors = {'Critique':'var(--tp)','Élevée':'var(--warn)','Moyenne':'var(--accent)','Faible':'var(--ok)'};
+  list.forEach(a => { buckets[severityOf(a).label]++; });
+  const max = Math.max(...Object.values(buckets), 1);
+  el.innerHTML = Object.entries(buckets).map(([label,n]) => `
+    <div class="mini-bar-row clickable-row${activeSeverityFilter === label ? ' selected' : ''}" data-severity="${escapeHtml(label)}" title="Cliquer pour filtrer le flux sur la sévérité ${escapeHtml(label)} (re-cliquer pour effacer)">
+      <span class="name">${label}</span>
+      <div class="mini-track"><div class="mini-fill" style="width:${(n/max*100).toFixed(0)}%; background:${colors[label]};"></div></div>
+      <span class="cnt">${n}</span>
+    </div>`).join('');
+  el.querySelectorAll('.clickable-row').forEach(row => {
+    row.addEventListener('click', () => {
+      const sev = row.dataset.severity;
+      setQuickFilter('severity', activeSeverityFilter === sev ? null : sev, sev);
+    });
+  });
+}
+
+/* ==================== Export ==================== */
+document.getElementById('btn-export').addEventListener('click', () => {
+  const filtered = applyFilters();
+  const blob = new Blob([JSON.stringify(filtered, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `soc_alerts_${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.json`;
+  link.click();
+  URL.revokeObjectURL(url);
+});
+
+/* ==================== Modal : détail alerte ==================== */
+function escapeHtml(str){
+  return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function syntaxHighlightJSON(json){
+  const s = JSON.stringify(json, null, 2);
+  return escapeHtml(s)
+    .replace(/(&quot;.*?&quot;)(:)/g, '<span class="json-key">$1</span>$2')
+    .replace(/: (&quot;.*?&quot;)/g, ': <span class="json-str">$1</span>')
+    .replace(/: (-?\d+\.?\d*)/g, ': <span class="json-num">$1</span>');
+}
+
+function kv(label, value){
+  return `<div class="kv"><span class="k">${escapeHtml(label)}</span><span class="v">${value === undefined || value === null || value === '' ? '—' : escapeHtml(value)}</span></div>`;
+}
+
+function openAlertModal(alert){
+  if (!alert) return;
+  document.getElementById('modal-title').textContent = `Alerte #${alert.rule_id ?? '—'}`;
+  document.getElementById('modal-summary').innerHTML = [
+    kv('Classification', alert.prediction),
+    kv('Confiance', alert.confidence !== undefined ? (alert.confidence*100).toFixed(1) + '%' : '—'),
+    kv('Règle', alert.rule_id),
+    kv('Description', alert.rule_description),
+  ].join('');
+  document.getElementById('modal-category').innerHTML = alert.category
+    ? `${catBadgeHtml(alert.category)} <span style="font-size:11px; color:var(--text-dim); margin-left:8px;">confiance catégorie : ${alert.category_confidence !== undefined ? (alert.category_confidence*100).toFixed(0) + '%' : '—'}</span>`
+    : '<span style="font-size:11.5px; color:var(--text-dim);">Non catégorisé</span>';
+  document.getElementById('modal-meta').innerHTML = [
+    kv('Agent', alert.agent_name),
+    kv('Horodatage', alert.timestamp),
+    kv('IP source', alert.srcip),
+    kv('IP destination', alert.dstip),
+    kv('Niveau de règle', alert.rule_level),
+    kv('Groupes de règle', alert.rule_groups),
+    kv('Tactique MITRE', alert.rule_mitre_tactic || alert.mitre_tactic),
+    kv('Technique MITRE', alert.rule_mitre_id || alert.mitre_id),
+    kv('Décodeur', alert.decoder_name),
+  ].join('');
+  document.getElementById('modal-log').innerHTML = syntaxHighlightJSON(alert);
+  document.getElementById('modal-overlay').classList.add('active');
+}
+document.getElementById('modal-close').addEventListener('click', () => document.getElementById('modal-overlay').classList.remove('active'));
+document.getElementById('modal-overlay').addEventListener('click', (e) => { if (e.target.id === 'modal-overlay') e.currentTarget.classList.remove('active'); });
+document.getElementById('modal-copy').addEventListener('click', () => {
+  const text = document.getElementById('modal-log').innerText;
+  navigator.clipboard?.writeText(text);
+});
+
+/* ==================== Stats ==================== */
+let latestStats = null; // dernier payload /stats reçu — réutilisé par la page Logs (débit) sans le recalculer
+
+function applyStats(s){
+  if (!s) return;
+  latestStats = s;
+  document.getElementById('c-total').textContent = s.total;
+  document.getElementById('c-tp').textContent = s.true_positive;
+  document.getElementById('c-fp').textContent = s.false_positive;
+  document.getElementById('c-rate').textContent = s.alerts_per_min.toFixed(1);
+  document.getElementById('c-conf').textContent = (s.avg_confidence*100).toFixed(1) + '%';
+  document.getElementById('c-tprate').textContent = (s.tp_rate*100).toFixed(1) + '%';
+
+  document.getElementById('a-total').textContent = s.total;
+  document.getElementById('a-tp').textContent = s.true_positive;
+  document.getElementById('a-fp').textContent = s.false_positive;
+  document.getElementById('a-rate').textContent = (s.tp_rate * 100).toFixed(1) + '%';
+  document.getElementById('a-apm').textContent = s.alerts_per_min.toFixed(1);
+  document.getElementById('a-conf').textContent = (s.avg_confidence * 100).toFixed(1) + '%';
+
+  document.getElementById('c-sql').textContent = (s.category_counts && s.category_counts.sql) || 0;
+  renderCategoryBreakdown(s.category_counts || {});
+
+  sparkHistory.push(s.total);
+  if (sparkHistory.length > 60) sparkHistory.shift();
+  renderSparkline();
+  renderLifecycleDiagram(s);
+}
+
+function renderCategoryBreakdown(counts){
+  const body = document.getElementById('category-breakdown');
+  if (!body) return;
+  const entries = Object.entries(counts).filter(([, n]) => n > 0).sort((a, b) => b[1] - a[1]);
+  if (!entries.length){
+    body.innerHTML = '<div class="empty-state">Aucune alerte traitée pour l\'instant.</div>';
+    return;
+  }
+  const max = Math.max(...entries.map(([, n]) => n));
+  const total = entries.reduce((s, [, n]) => s + n, 0);
+  body.innerHTML = entries.map(([slug, n]) => {
+    const meta = catMeta(slug);
+    const share = ((n / total) * 100).toFixed(1);
+    return `
+    <div class="bar-row clickable-row" data-category="${escapeHtml(slug)}" title="${escapeHtml(meta.label)} : ${n} alerte(s) — ${share}% du total classifié. Cliquer pour filtrer.">
+      <span class="name">${escapeHtml(meta.label)}</span>
+      <div class="bar-track"><div class="bar-fill" style="width:${(n/max*100).toFixed(1)}%; background:var(--${meta.color});"></div></div>
+      <span class="pct">${n}</span>
+    </div>`;
+  }).join('');
+  body.querySelectorAll('.clickable-row').forEach(row => {
+    row.addEventListener('click', () => {
+      const slug = row.dataset.category;
+      switchToClassificationTab();
+      setQuickFilter('category', slug, catMeta(slug).label);
+    });
+  });
+}
+
+async function loadStats(){
+  try {
+    const res = await fetch(API + '/stats');
+    if (!res.ok) return;
+    const s = await res.json();
+    applyStats(s);
+    bc?.postMessage({type:'stats', data: s});
+  } catch(e){ /* silencieux */ }
+}
+
+const SPARK_W = 560, SPARK_H = 120, SPARK_PAD = 8;
+
+function renderSparkline(){
+  const svg = document.getElementById('sparkline');
+  if (sparkHistory.length < 2){ svg.innerHTML = ''; return; }
+  const max = Math.max(...sparkHistory, 1);
+  const min = Math.min(...sparkHistory);
+  const range = Math.max(max - min, 1);
+  const step = (SPARK_W - SPARK_PAD*2) / (sparkHistory.length - 1);
+  const pts = sparkHistory.map((v,i) => {
+    const x = SPARK_PAD + i*step;
+    const y = SPARK_H - SPARK_PAD - ((v-min)/range)*(SPARK_H-SPARK_PAD*2);
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(' ');
+  svg.innerHTML = `
+    <polyline points="${pts}" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    <polyline points="${SPARK_PAD},${SPARK_H-SPARK_PAD} ${pts} ${SPARK_W-SPARK_PAD},${SPARK_H-SPARK_PAD}" fill="var(--accent)" opacity="0.08" stroke="none"/>
+    <line id="spark-crosshair" x1="0" y1="${SPARK_PAD}" x2="0" y2="${SPARK_H-SPARK_PAD}" stroke="var(--line)" stroke-width="1" opacity="0"/>
+    <circle id="spark-dot" r="3.5" fill="var(--accent)" stroke="var(--panel)" stroke-width="2" opacity="0"/>
+  `;
+}
+
+/* Hover crosshair + tooltip (attaché une seule fois : les nœuds #spark-crosshair/#spark-dot
+   sont recréés à chaque renderSparkline() mais retrouvés par id à chaque mousemove, donc pas
+   besoin de ré-attacher l'écouteur). Conforme à la règle dataviz "un graphique ligne/aire a
+   par défaut un crosshair+tooltip au survol". */
+function initSparklineHover(){
+  const svg = document.getElementById('sparkline');
+  const tooltip = document.getElementById('spark-tooltip');
+  svg.addEventListener('mousemove', (e) => {
+    if (sparkHistory.length < 2) return;
+    const rect = svg.getBoundingClientRect();
+    const relX = (e.clientX - rect.left) / rect.width * SPARK_W;
+    const step = (SPARK_W - SPARK_PAD*2) / (sparkHistory.length - 1);
+    let idx = Math.round((relX - SPARK_PAD) / step);
+    idx = Math.max(0, Math.min(sparkHistory.length - 1, idx));
+    const max = Math.max(...sparkHistory, 1);
+    const min = Math.min(...sparkHistory);
+    const range = Math.max(max - min, 1);
+    const x = SPARK_PAD + idx*step;
+    const y = SPARK_H - SPARK_PAD - ((sparkHistory[idx]-min)/range)*(SPARK_H-SPARK_PAD*2);
+
+    const crosshair = document.getElementById('spark-crosshair');
+    const dot = document.getElementById('spark-dot');
+    crosshair?.setAttribute('x1', x); crosshair?.setAttribute('x2', x); crosshair?.setAttribute('opacity', '0.6');
+    dot?.setAttribute('cx', x); dot?.setAttribute('cy', y); dot?.setAttribute('opacity', '1');
+
+    tooltip.style.left = (x * (rect.width / SPARK_W)) + 'px';
+    tooltip.style.top = (y * (rect.height / SPARK_H)) + 'px';
+    const stepsAgo = sparkHistory.length - 1 - idx;
+    tooltip.textContent = `${sparkHistory[idx]} alertes${stepsAgo ? ` · il y a ${stepsAgo} rafraîchissement(s)` : ' · maintenant'}`;
+    tooltip.classList.add('visible');
+  });
+  svg.addEventListener('mouseleave', () => {
+    document.getElementById('spark-crosshair')?.setAttribute('opacity', '0');
+    document.getElementById('spark-dot')?.setAttribute('opacity', '0');
+    tooltip.classList.remove('visible');
+  });
+}
+
+/* ==================== Feature importance ==================== */
+function applyImportance(data, errorMsg){
+  const body = document.getElementById('importance-body');
+  if (errorMsg){
+    body.innerHTML = `<div class="empty-state">${escapeHtml(errorMsg)}</div>`;
+    return;
+  }
+  if (!data || !data.length){
+    body.innerHTML = '<div class="empty-state">Aucune donnée d\'importance disponible.</div>';
+    return;
+  }
+  const max = Math.max(...data.map(d => d.importance));
+  body.innerHTML = data.map(d => `
+    <div class="bar-row" title="${escapeHtml(d.feature)} : importance ${(d.importance * 100).toFixed(2)}% dans le modèle Random Forest">
+      <span class="name">${escapeHtml(d.feature.replace(/_/g, ' '))}</span>
+      <div class="bar-track"><div class="bar-fill" style="width:${(d.importance / max * 100).toFixed(1)}%"></div></div>
+      <span class="pct">${(d.importance * 100).toFixed(1)}%</span>
+    </div>
+  `).join('');
+}
+
+async function loadImportance(){
+  try {
+    const res = await fetch(API + '/model/importance');
+    if (!res.ok){
+      applyImportance(null, "Modèle non chargé — lancez l'entraînement (train_model.py) puis redémarrez l'API.");
+      return;
+    }
+    const data = await res.json();
+    applyImportance(data);
+    bc?.postMessage({type:'importance', data});
+  } catch(e){
+    applyImportance(null, "API injoignable.");
+  }
+}
+
+/* ==================== Diagramme d'états : cycle de vie ==================== */
+function renderLifecycleDiagram(stats){
+  const svg = document.getElementById('lifecycle-diagram');
+  const total = stats ? stats.total : 0;
+  const tp = stats ? stats.true_positive : 0;
+  const fp = stats ? stats.false_positive : 0;
+  const box = (x,y,w,h,label,sub,color) => `
+    <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="8" fill="var(--panel-2)" stroke="${color}" stroke-width="1.5"/>
+    <text x="${x+w/2}" y="${y+h/2-4}" text-anchor="middle" font-family="var(--display)" font-size="12" font-weight="600" fill="var(--text)">${label}</text>
+    <text x="${x+w/2}" y="${y+h/2+14}" text-anchor="middle" font-family="var(--mono)" font-size="11" fill="${color}">${sub}</text>
+  `;
+  const arrow = (x1,y1,x2,y2) => `
+    <line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="var(--line)" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  `;
+  svg.innerHTML = `
+    <defs>
+      <marker id="arrowhead" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+        <path d="M0,0 L8,4 L0,8 Z" fill="var(--line)"/>
+      </marker>
+    </defs>
+    ${box(180,10,200,60,'Alerte Wazuh','Ingestion agent',"var(--text-dim)")}
+    ${arrow(280,70,280,105)}
+    ${box(180,110,200,60,'Classification ML (L1)',`${total} traitées`,"var(--accent)")}
+    ${arrow(230,170,120,205)}
+    ${arrow(330,170,440,205)}
+    ${box(20,210,220,60,'Clôturé — bruit (FP)',`${fp} alertes archivées`,"var(--fp-text)")}
+    ${box(320,210,220,60,'Escaladé (TP)',`${tp} → notification Telegram/n8n`,"var(--tp)")}
+    ${arrow(430,270,430,305)}
+    ${box(320,310,220,55,'Investigation L2','Suivi manuel — non mesuré ici',"var(--text-dim)")}
+    ${arrow(430,365,430,395)}
+    ${box(320,395,220,20,'',"",'transparent')}
+  `.replace(box(320,395,220,20,'',"",'transparent'), '');
+  // ligne de clôture finale (résolution / post-mortem), en texte simple sous le diagramme
+}
+
+/* ==================== Diagramme MITRE ATT&CK ==================== */
+const MITRE_TACTICS = [
+  'Reconnaissance','Initial Access','Execution','Persistence',
+  'Privilege Escalation','Defense Evasion','Credential Access',
+  'Lateral Movement','Collection','Exfiltration','Impact'
+];
+function normTactic(s){ return String(s||'').toLowerCase().replace(/[^a-z]/g,''); }
+
+function renderMitreDiagram(){
+  const svg = document.getElementById('mitre-diagram');
+  const caption = document.getElementById('mitre-caption');
+  const counts = {};
+  MITRE_TACTICS.forEach(t => counts[t] = 0);
+  let anyData = false;
+
+  // Co-occurrence : tactiques observées pour un même agent dans la fenêtre affichée, pour
+  // faire apparaître une chaîne d'attaque potentielle (ex. Initial Access -> Execution -> C2).
+  const tacticsByAgent = {};
+  currentAlerts.forEach(a => {
+    const raw = a.rule_mitre_tactic || a.mitre_tactic;
+    if (!raw) return;
+    const agent = a.agent_name || 'unknown';
+    String(raw).split(',').forEach(part => {
+      const n = normTactic(part);
+      if (!n) return;
+      MITRE_TACTICS.forEach(t => {
+        if (normTactic(t) === n || n.includes(normTactic(t))){
+          counts[t]++;
+          anyData = true;
+          if (!tacticsByAgent[agent]) tacticsByAgent[agent] = new Set();
+          tacticsByAgent[agent].add(t);
+        }
+      });
+    });
+  });
+
+  const max = Math.max(...Object.values(counts), 1);
+
+  const w = 560, h = 400;
+  const cols = 3;
+  const rows = Math.ceil(MITRE_TACTICS.length / cols);
+  const cellW = w / cols;
+  const cellH = (h - 20) / rows;
+  const r = Math.min(cellW, cellH) * 0.22;
+
+  const centers = {};
+  MITRE_TACTICS.forEach((t, i) => {
+    const col = i % cols;
+    const row = Math.floor(i / cols);
+    centers[t] = { cx: cellW * col + cellW / 2, cy: cellH * row + cellH / 2 + 10 };
+  });
+
+  // Comptage des co-occurrences par paire de tactiques, tous agents confondus.
+  const pairCounts = {};
+  Object.values(tacticsByAgent).forEach(set => {
+    const arr = [...set];
+    for (let i = 0; i < arr.length; i++){
+      for (let j = i+1; j < arr.length; j++){
+        const key = [arr[i], arr[j]].sort().join('|');
+        pairCounts[key] = (pairCounts[key] || 0) + 1;
+      }
+    }
+  });
+
+  const edges = Object.entries(pairCounts).map(([key, n]) => {
+    const [t1, t2] = key.split('|');
+    const c1 = centers[t1], c2 = centers[t2];
+    const width = 1 + Math.min(n, 6) * 0.7;
+    return `<line x1="${c1.cx}" y1="${c1.cy}" x2="${c2.cx}" y2="${c2.cy}" stroke="var(--ai)" stroke-width="${width.toFixed(1)}" opacity="0.35"/>`;
+  }).join('');
+
+  let nodes = '';
+  MITRE_TACTICS.forEach((t, i) => {
+    const { cx, cy } = centers[t];
+    const n = counts[t];
+    const active = n > 0;
+    const radius = r * (0.75 + (n / max) * 0.4);
+    const words = t.split(' ');
+
+    nodes += `
+      <g>
+        <text x="${cx}" y="${cy - radius - 20}" text-anchor="middle" font-family="var(--mono)" font-size="9.5" fill="var(--text-dim)">${String(i+1).padStart(2,'0')}</text>
+        <circle cx="${cx}" cy="${cy}" r="${radius.toFixed(1)}" fill="${active ? 'var(--accent)' : 'var(--panel-2)'}" stroke="${active ? 'var(--accent)' : 'var(--line)'}" stroke-width="1.5" opacity="${active ? 0.9 : 0.6}"/>
+        <text x="${cx}" y="${cy+4}" text-anchor="middle" font-family="var(--display)" font-size="13" font-weight="700" fill="${active ? '#06121a' : 'var(--text-dim)'}">${n || ''}</text>
+        ${words.map((word, wi) => `<text x="${cx}" y="${cy + radius + 16 + wi*13}" text-anchor="middle" font-family="var(--mono)" font-size="10.5" fill="var(--text-dim)">${word}</text>`).join('')}
+      </g>
+    `;
+  });
+  svg.innerHTML = edges + nodes;
+  caption.textContent = anyData
+    ? "Taille/couleur des nœuds proportionnelles au nombre d'alertes par tactique. Les liens violets relient des tactiques observées pour un même agent dans la fenêtre affichée (chaîne d'attaque potentielle)."
+    : "Aucun champ MITRE (rule_mitre_tactic) détecté dans les alertes reçues — le diagramme référence le modèle ATT&CK complet en attendant des données enrichies.";
+}
+
+/* ==================== Live refresh ==================== */
+function refreshAll(){
+  checkSession();
+  checkHealth();
+  loadFeed();
+  loadStats();
+  // Épargne des requêtes DMV inutiles sur le SQL Server surveillé quand cet onglet n'est
+  // pas affiché — refreshSql() reste appelé immédiatement au clic sur l'onglet (voir le
+  // handler des tab-btn) donc les données restent fraîches dès qu'on la consulte.
+  if (document.querySelector('.view.active')?.id === 'view-sql') refreshSql();
+}
+document.getElementById('toggle-live').addEventListener('change', (e) => {
+  if (e.target.checked){
+    liveTimer = setInterval(refreshAll, POLL_MS);
+  } else if (liveTimer){
+    clearInterval(liveTimer);
+    liveTimer = null;
+  }
+});
+updateSyncPill();
+checkSession();
+loadCategoryMeta();
+refreshAll();
+liveTimer = setInterval(refreshAll, POLL_MS);
+connectEventStream();
+initSparklineHover();
+
+/* ==================== SQL Server monitoring ==================== */
+let sqlSessions = [];
+
+function escapeText(v){ return v === null || v === undefined || v === '' ? '—' : escapeHtml(v); }
+function fmtDate(v){ if (!v) return '—'; try { return new Date(v).toLocaleString('fr-FR'); } catch(e){ return v; } }
+
+function applySqlHealth(ok, data){
+  const dot = document.getElementById('sql-dot');
+  const text = document.getElementById('sql-status-text');
+  if (ok){
+    dot.className = 'dot online';
+    text.textContent = data?.server_name ? `En ligne (${data.server_name})` : 'En ligne';
+  } else {
+    dot.className = 'dot offline';
+    text.textContent = 'Injoignable';
+  }
+}
+
+async function loadSqlHealth(){
+  try {
+    const res = await fetch(API + '/sql/health');
+    if (!res.ok) throw new Error('bad status');
+    const data = await res.json();
+    applySqlHealth(true, data);
+    bc?.postMessage({type:'sqlHealth', ok:true, data});
+  } catch(e){
+    applySqlHealth(false, null);
+    bc?.postMessage({type:'sqlHealth', ok:false, data:null});
+  }
+}
+
+function renderSqlSessionsTable(){
+  const tbody = document.querySelector('#sql-sessions-table tbody');
+  const q = document.getElementById('sql-sessions-search').value.trim().toLowerCase();
+  const filtered = sqlSessions.filter(s => {
+    if (!q) return true;
+    const hay = `${s.login_name||''} ${s.host_name||''} ${s.program_name||''}`.toLowerCase();
+    return hay.includes(q);
+  });
+  if (!filtered.length){
+    tbody.innerHTML = '<tr><td colspan="9" class="empty-state">Aucune session active (ou API SQL injoignable).</td></tr>';
+    return;
+  }
+  tbody.innerHTML = filtered.map(s => `
+    <tr>
+      <td>${escapeText(s.session_id)}</td>
+      <td>${escapeText(s.login_name)}</td>
+      <td>${escapeText(s.host_name)}</td>
+      <td>${escapeText(s.program_name)}</td>
+      <td>${escapeText(s.database_name)}</td>
+      <td><span class="pill-state ${String(s.status).toLowerCase().includes('run') ? 'running' : 'sleeping'}">${escapeText(s.status)}</span></td>
+      <td>${escapeText(s.client_net_address)}</td>
+      <td>${fmtDate(s.login_time)}</td>
+      <td>${fmtDate(s.last_request_start_time)}</td>
+    </tr>`).join('');
+}
+document.getElementById('sql-sessions-search').addEventListener('input', renderSqlSessionsTable);
+
+function applySqlSessions(data){
+  sqlSessions = data || [];
+  document.getElementById('sql-c-sessions').textContent = sqlSessions.length;
+  renderSqlSessionsTable();
+}
+async function loadSqlSessions(){
+  try {
+    const res = await fetch(API + '/sql/sessions');
+    if (!res.ok) throw new Error('bad status');
+    const data = await res.json();
+    applySqlSessions(data);
+    bc?.postMessage({type:'sqlSessions', data});
+  } catch(e){
+    document.getElementById('sql-c-sessions').textContent = '—';
+    applySqlSessions([]);
+  }
+}
+
+function applySqlUsers(users){
+  const el = document.getElementById('sql-users-list');
+  users = users || [];
+  document.getElementById('sql-c-users').textContent = users.length;
+  if (!users.length){
+    el.innerHTML = '<div class="empty-state">Aucun utilisateur actuellement connecté.</div>';
+    return;
+  }
+  el.innerHTML = users.map(u => `
+    <div class="user-card">
+      <div>
+        <div class="login">${escapeHtml(u.login_name)}</div>
+        <div class="sub">${(u.hosts||[]).join(', ') || '—'} · ${(u.programs||[]).join(', ') || '—'}</div>
+      </div>
+      <div class="count">${u.session_count}</div>
+    </div>`).join('');
+}
+async function loadSqlUsers(){
+  try {
+    const res = await fetch(API + '/sql/users');
+    if (!res.ok) throw new Error('bad status');
+    const users = await res.json();
+    applySqlUsers(users);
+    bc?.postMessage({type:'sqlUsers', data: users});
+  } catch(e){
+    document.getElementById('sql-c-users').textContent = '—';
+    document.getElementById('sql-users-list').innerHTML = '<div class="empty-state">API SQL injoignable.</div>';
+  }
+}
+
+function applySqlPermissions(data){
+  const rolesBody = document.querySelector('#sql-roles-table tbody');
+  const permsBody = document.querySelector('#sql-perms-table tbody');
+  const roles = data?.role_memberships || [];
+  const perms = data?.explicit_permissions || [];
+
+  rolesBody.innerHTML = roles.length ? roles.map(r => `
+    <tr>
+      <td>${escapeText(r.login_name)}</td>
+      <td>${escapeText(r.login_type)}</td>
+      <td>${r.is_disabled ? 'Oui' : 'Non'}</td>
+      <td>${escapeText(r.server_role)}</td>
+    </tr>`).join('') : '<tr><td colspan="4" class="empty-state">Aucune donnée.</td></tr>';
+
+  permsBody.innerHTML = perms.length ? perms.map(p => `
+    <tr>
+      <td>${escapeText(p.grantee)}</td>
+      <td>${escapeText(p.grantee_type)}</td>
+      <td>${escapeText(p.permission_name)}</td>
+      <td>${escapeText(p.state_desc)}</td>
+    </tr>`).join('') : '<tr><td colspan="4" class="empty-state">Aucune donnée.</td></tr>';
+}
+async function loadSqlPermissions(){
+  try {
+    const res = await fetch(API + '/sql/permissions');
+    if (!res.ok) throw new Error('bad status');
+    const data = await res.json();
+    applySqlPermissions(data);
+    bc?.postMessage({type:'sqlPermissions', data});
+  } catch(e){
+    document.querySelector('#sql-roles-table tbody').innerHTML = '<tr><td colspan="4" class="empty-state">API SQL injoignable.</td></tr>';
+    document.querySelector('#sql-perms-table tbody').innerHTML = '<tr><td colspan="4" class="empty-state">API SQL injoignable.</td></tr>';
+  }
+}
+
+function applySqlEvents(events){
+  const feed = document.getElementById('sql-events-feed');
+  events = events || [];
+  document.getElementById('sql-c-events').textContent = events.length;
+  if (!events.length){
+    feed.innerHTML = '<div class="feed-empty">Aucun événement corrélé pour l\'agent SQL Server configuré.</div>';
+    return;
+  }
+  feed.innerHTML = events.map((a, idx) => `
+    <div class="feed-item${a.category === 'sql' ? ' cat-sql' : ''}" data-sql-idx="${idx}">
+      <span class="badge ${badgeClass(a.prediction)}">${a.prediction === 'True Positive' ? 'TP' : 'FP'}</span>
+      <div class="feed-desc">
+        <span class="rule">#${a.rule_id ?? '—'} — ${a.rule_description || 'Sans description'}</span>
+        <span class="meta">${a.agent_name || 'unknown'}${a.timestamp ? ' · ' + a.timestamp : ''} · ${catBadgeHtml(a.category)}</span>
+      </div>
+      <span class="feed-conf">${(a.confidence*100).toFixed(1)}%</span>
+    </div>`).join('');
+  feed.querySelectorAll('.feed-item').forEach(el => {
+    el.addEventListener('click', () => openAlertModal(events[parseInt(el.dataset.sqlIdx, 10)]));
+  });
+}
+async function loadSqlEvents(){
+  try {
+    const res = await fetch(API + '/sql/security-events?limit=25');
+    if (!res.ok) throw new Error('bad status');
+    const events = await res.json();
+    applySqlEvents(events);
+    bc?.postMessage({type:'sqlEvents', data: events});
+  } catch(e){
+    document.getElementById('sql-c-events').textContent = '—';
+    document.getElementById('sql-events-feed').innerHTML = '<div class="feed-empty">API injoignable.</div>';
+  }
+}
+
+function refreshSql(){
+  loadSqlHealth();
+  loadSqlSessions();
+  loadSqlUsers();
+  loadSqlPermissions();
+  loadSqlEvents();
+}
+
+/* ==================== Hygiène IT (inventaire syscollector via API Wazuh) ====================
+   Volontairement PAS dans le cycle de rafraîchissement 5s (refreshAll) : l'inventaire logiciel/
+   ports/processus ne change pas d'une seconde à l'autre, et /hygiene/overview fait plusieurs
+   appels à l'API Wazuh par agent — on charge au changement d'onglet + bouton "Actualiser". */
+let hygieneOverview = [];
+let hygSelectedAgentId = null;
+let hygDetailData = { packages: [], ports: [], processes: [], hotfixes: [], findings: [], cves: [], cveDataAvailable: false };
+let hygActiveSub = 'findings';
+
+function scoreClass(score){
+  if (score >= 75) return 'good';
+  if (score >= 50) return 'warn';
+  return 'bad';
+}
+
+function cveSummaryCell(a){
+  if (!a.cve_data_available) return '<span style="color:var(--text-dim); font-size:11px;">Module non actif</span>';
+  const c = a.cve_counts || {};
+  if (!a.cve_total) return '<span style="color:var(--ok); font-size:11px;">Aucune CVE</span>';
+  const parts = [];
+  if (c.critical) parts.push(`<span class="cve-badge critical">${c.critical} crit.</span>`);
+  if (c.high) parts.push(`<span class="cve-badge high">${c.high} haute</span>`);
+  if (c.medium) parts.push(`<span class="cve-badge medium">${c.medium} moy.</span>`);
+  if (c.low || c.untriaged) parts.push(`<span class="cve-badge low">${(c.low||0)+(c.untriaged||0)} basse</span>`);
+  return `<div class="cve-summary-cell">${parts.join('')}</div>`;
+}
+
+async function loadHygieneOverview(){
+  const tbody = document.querySelector('#hyg-agents-table tbody');
+  try {
+    const res = await fetch(API + '/hygiene/overview');
+    if (!res.ok){
+      const err = await res.json().catch(() => ({}));
+      tbody.innerHTML = `<tr><td colspan="8" class="empty-state">${escapeHtml(err.detail || "API Wazuh injoignable — configure WAZUH_API_* côté serveur.")}</td></tr>`;
+      resetHygieneCounters();
+      return;
+    }
+    hygieneOverview = await res.json();
+    renderHygieneCounters();
+    renderHygieneAgentsTable();
+  } catch(e){
+    tbody.innerHTML = '<tr><td colspan="8" class="empty-state">API injoignable.</td></tr>';
+    resetHygieneCounters();
+  }
+}
+
+function resetHygieneCounters(){
+  document.getElementById('hyg-c-agents').textContent = '—';
+  document.getElementById('hyg-c-avgscore').textContent = '—';
+  document.getElementById('hyg-c-worst').textContent = '—';
+  document.getElementById('hyg-c-sensitive').textContent = '—';
+  document.getElementById('hyg-c-cve-critical').textContent = '—';
+  document.getElementById('hyg-c-cve-high').textContent = '—';
+}
+
+function renderHygieneCounters(){
+  if (!hygieneOverview.length){ resetHygieneCounters(); return; }
+  const avg = hygieneOverview.reduce((s, a) => s + a.score, 0) / hygieneOverview.length;
+  const worst = hygieneOverview[0]; // déjà trié croissant côté API
+  const sensitiveTotal = hygieneOverview.reduce((s, a) => s + (a.exposed_sensitive_ports || []).length, 0);
+  const cveCriticalTotal = hygieneOverview.reduce((s, a) => s + ((a.cve_counts || {}).critical || 0), 0);
+  const cveHighTotal = hygieneOverview.reduce((s, a) => s + ((a.cve_counts || {}).high || 0), 0);
+  document.getElementById('hyg-c-agents').textContent = hygieneOverview.length;
+  document.getElementById('hyg-c-avgscore').textContent = avg.toFixed(0);
+  document.getElementById('hyg-c-worst').textContent = worst ? `${worst.agent_name} (${worst.score})` : '—';
+  document.getElementById('hyg-c-sensitive').textContent = sensitiveTotal;
+  document.getElementById('hyg-c-cve-critical').textContent = cveCriticalTotal;
+  document.getElementById('hyg-c-cve-high').textContent = cveHighTotal;
+}
+
+function renderHygieneAgentsTable(){
+  const tbody = document.querySelector('#hyg-agents-table tbody');
+  const q = document.getElementById('hyg-agents-search').value.trim().toLowerCase();
+  const filtered = hygieneOverview.filter(a => {
+    if (!q) return true;
+    const hay = `${a.agent_name||''} ${a.ip||''} ${a.os_name||''}`.toLowerCase();
+    return hay.includes(q);
+  });
+  if (!filtered.length){
+    tbody.innerHTML = '<tr><td colspan="9" class="empty-state">Aucun agent ne correspond.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = filtered.map(a => `
+    <tr class="hygiene-row${a.agent_id === hygSelectedAgentId ? ' selected' : ''}" data-agent-id="${escapeHtml(a.agent_id)}" data-agent-name="${escapeHtml(a.agent_name||'')}">
+      <td><span class="score-pill ${scoreClass(a.score)}">${a.score}</span></td>
+      <td>${escapeHtml(a.agent_name)}</td>
+      <td>${escapeText(a.ip)}</td>
+      <td>${escapeText(a.os_name)}${a.eol_os ? ' <span class="pill-state running" title="' + escapeHtml(a.eol_os) + '">EOL</span>' : ''}</td>
+      <td><span class="pill-state ${a.status === 'active' ? 'running' : 'sleeping'}">${escapeText(a.status)}</span></td>
+      <td>${(a.exposed_sensitive_ports||[]).map(p => `<span class="port-chip">${p.port} · ${escapeHtml(p.service)}</span>`).join('') || '—'}</td>
+      <td>${a.listening_ports_count ?? '—'}</td>
+      <td>${a.no_patch_data ? '<span class="pill-state running">Aucun recensé</span>' : 'OK'}</td>
+      <td><span class="cve-jump" style="cursor:pointer;" title="Cliquer pour ouvrir l'onglet CVE de cet agent">${cveSummaryCell(a)}</span></td>
+    </tr>`).join('');
+  tbody.querySelectorAll('.hygiene-row').forEach(row => {
+    row.addEventListener('click', () => selectHygieneAgent(row.dataset.agentId, row.dataset.agentName));
+  });
+  tbody.querySelectorAll('.cve-jump').forEach(el => {
+    el.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const row = e.currentTarget.closest('tr');
+      await selectHygieneAgent(row.dataset.agentId, row.dataset.agentName);
+      document.querySelector('.hygiene-tabs .chip[data-hygsub="cves"]')?.click();
+    });
+  });
+}
+document.getElementById('hyg-agents-search').addEventListener('input', renderHygieneAgentsTable);
+
+async function selectHygieneAgent(agentId, agentName){
+  hygSelectedAgentId = agentId;
+  renderHygieneAgentsTable();
+  document.getElementById('hyg-detail-panel').style.display = '';
+  document.getElementById('hyg-detail-title').textContent = `Détail agent — ${agentName} (${agentId})`;
+  document.getElementById('hyg-detail-search').value = '';
+
+  const setLoading = (id, cols) => {
+    document.querySelector(`#${id} tbody`).innerHTML = `<tr><td colspan="${cols}" class="empty-state">Chargement…</td></tr>`;
+  };
+  setLoading('hyg-packages-table', 5);
+  setLoading('hyg-ports-table', 6);
+  setLoading('hyg-processes-table', 5);
+  setLoading('hyg-hotfixes-table', 1);
+  setLoading('hyg-cves-table', 7);
+
+  const [packages, ports, processes, hotfixes, cves] = await Promise.all([
+    fetch(API + `/hygiene/agent/${agentId}/packages`).then(r => r.ok ? r.json() : []).catch(() => []),
+    fetch(API + `/hygiene/agent/${agentId}/ports`).then(r => r.ok ? r.json() : []).catch(() => []),
+    fetch(API + `/hygiene/agent/${agentId}/processes`).then(r => r.ok ? r.json() : []).catch(() => []),
+    fetch(API + `/hygiene/agent/${agentId}/hotfixes`).then(r => r.ok ? r.json() : []).catch(() => []),
+    fetch(API + `/hygiene/agent/${agentId}/vulnerabilities`).then(r => r.ok ? r.json() : []).catch(() => []),
+  ]);
+  // Les findings (failles/vulnérabilités) et la disponibilité du module CVE sont déjà calculés
+  // par /hygiene/overview, pas besoin d'un appel réseau supplémentaire : on relit simplement la
+  // ligne déjà chargée pour cet agent.
+  const overviewRow = hygieneOverview.find(a => a.agent_id === agentId);
+  hygDetailData = {
+    packages, ports, processes, hotfixes, cves,
+    findings: (overviewRow && overviewRow.findings) || [],
+    cveDataAvailable: !!(overviewRow && overviewRow.cve_data_available),
+  };
+  renderHygieneDetail();
+}
+
+document.getElementById('hyg-detail-close').addEventListener('click', () => {
+  hygSelectedAgentId = null;
+  document.getElementById('hyg-detail-panel').style.display = 'none';
+  renderHygieneAgentsTable();
+});
+
+document.querySelectorAll('.hygiene-tabs .chip[data-hygsub]').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('.hygiene-tabs .chip[data-hygsub]').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    hygActiveSub = chip.dataset.hygsub;
+    document.querySelectorAll('.hygiene-subview').forEach(v => v.classList.remove('active'));
+    document.getElementById('hygsub-' + hygActiveSub).classList.add('active');
+    renderHygieneDetail();
+  });
+});
+document.getElementById('hyg-detail-search').addEventListener('input', renderHygieneDetail);
+
+function fmtEpoch(v){
+  if (!v) return '—';
+  try {
+    // syscollector renvoie parfois un epoch (secondes) et parfois une date ISO selon le champ.
+    const n = Number(v);
+    const d = !isNaN(n) && n > 0 ? new Date(n * 1000) : new Date(v);
+    return isNaN(d.getTime()) ? String(v) : d.toLocaleString('fr-FR');
+  } catch(e){ return String(v); }
+}
+
+const HYG_SEVERITY_META = {
+  high: { label: 'Critique', color: 'var(--tp)' },
+  medium: { label: 'Moyenne', color: 'var(--warn)' },
+  low: { label: 'Faible', color: 'var(--text-dim, #8a95a3)' },
+};
+
+function renderHygieneDetail(){
+  const q = document.getElementById('hyg-detail-search').value.trim().toLowerCase();
+  const matches = (hay) => !q || hay.toLowerCase().includes(q);
+
+  if (hygActiveSub === 'findings'){
+    const rows = (hygDetailData.findings || []).filter(f => matches(`${f.title||''} ${f.detail||''}`));
+    const list = document.getElementById('hyg-findings-list');
+    list.innerHTML = rows.length ? rows.map(f => {
+      const meta = HYG_SEVERITY_META[f.severity] || HYG_SEVERITY_META.low;
+      return `
+      <div style="border-left:3px solid ${meta.color}; background:var(--panel-2); border-radius:6px; padding:10px 14px; margin:0 16px 8px;">
+        <div style="display:flex; justify-content:space-between; gap:8px; align-items:baseline;">
+          <strong>${escapeHtml(f.title)}</strong>
+          <span class="pill-state" style="background:${meta.color}; color:#fff;">${meta.label}</span>
+        </div>
+        <div style="color:var(--text-dim, #8a95a3); font-size:13px; margin-top:4px;">${escapeHtml(f.detail || '')}</div>
+      </div>`;
+    }).join('') : '<div class="empty-state">Aucune vulnérabilité/faille détectée pour cet agent (score maximal).</div>';
+    list.className = rows.length ? '' : 'empty-state';
+  }
+
+  if (hygActiveSub === 'cves'){
+    const note = document.getElementById('hyg-cves-note');
+    if (!hygDetailData.cveDataAvailable){
+      note.style.display = '';
+      note.textContent = "Module Vulnerability Detector non actif (ou indisponible) sur ce manager Wazuh pour cet agent — le score d'hygiène retombe sur l'heuristique locale (ports/correctifs/EOL) seule, voir l'onglet Vulnérabilités.";
+    } else if (!hygDetailData.cves.length){
+      note.style.display = '';
+      note.textContent = "Module actif : aucune CVE corrélée pour les logiciels actuellement installés sur cet agent.";
+    } else {
+      note.style.display = 'none';
+    }
+    const rows = hygDetailData.cves
+      .filter(v => matches(`${v.cve||''} ${v.name||''} ${v.version||''}`))
+      .slice()
+      .sort((a, b) => {
+        const rank = {critical:0, high:1, medium:2, low:3};
+        const ra = rank[String(a.severity||'').toLowerCase()] ?? 4;
+        const rb = rank[String(b.severity||'').toLowerCase()] ?? 4;
+        if (ra !== rb) return ra - rb;
+        return (Number(b.cvss3_score || b.cvss2_score || 0)) - (Number(a.cvss3_score || a.cvss2_score || 0));
+      });
+    const tbody = document.querySelector('#hyg-cves-table tbody');
+    tbody.innerHTML = rows.length ? rows.map(v => {
+      const sev = String(v.severity || 'low').toLowerCase();
+      const sevClass = ['critical','high','medium'].includes(sev) ? sev : 'low';
+      const cvss = v.cvss3_score || v.cvss2_score || '—';
+      return `
+      <tr>
+        <td>${escapeText(v.cve)}</td>
+        <td><span class="cve-badge ${sevClass}">${escapeText(v.severity || 'Non triée')}</span></td>
+        <td>${escapeText(cvss)}</td>
+        <td>${escapeText(v.name)}</td>
+        <td>${escapeText(v.version)}</td>
+        <td>${escapeText(v.condition)}</td>
+        <td>${escapeText(v.published)}</td>
+      </tr>`;
+    }).join('') : `<tr><td colspan="7" class="empty-state">${hygDetailData.cveDataAvailable ? 'Aucune CVE ne correspond.' : 'Module Vulnerability Detector non actif pour cet agent.'}</td></tr>`;
+  }
+
+  if (hygActiveSub === 'packages'){
+    const rows = hygDetailData.packages.filter(p => matches(`${p.name||''} ${p.vendor||''}`));
+    const tbody = document.querySelector('#hyg-packages-table tbody');
+    tbody.innerHTML = rows.length ? rows.map(p => `
+      <tr>
+        <td>${escapeText(p.name)}</td>
+        <td>${escapeText(p.version)}</td>
+        <td>${escapeText(p.architecture)}</td>
+        <td>${escapeText(p.vendor)}</td>
+        <td>${fmtEpoch(p.install_time || p.installed)}</td>
+      </tr>`).join('') : '<tr><td colspan="5" class="empty-state">Aucun logiciel trouvé.</td></tr>';
+  }
+
+  if (hygActiveSub === 'ports'){
+    const rows = hygDetailData.ports.filter(p => matches(`${(p.local||{}).port||''} ${p.process||''} ${p.protocol||''}`));
+    const tbody = document.querySelector('#hyg-ports-table tbody');
+    tbody.innerHTML = rows.length ? rows.map(p => {
+      const local = p.local || {};
+      const sensitive = SENSITIVE_PORTS_CLIENT[local.port];
+      return `
+      <tr>
+        <td>${escapeText(p.protocol)}</td>
+        <td>${escapeText(local.ip)}</td>
+        <td>${sensitive ? `<span class="port-chip">${local.port} · ${sensitive}</span>` : escapeText(local.port)}</td>
+        <td>${escapeText(p.state)}</td>
+        <td>${escapeText(p.process)}</td>
+        <td>${escapeText(p.pid)}</td>
+      </tr>`;
+    }).join('') : '<tr><td colspan="6" class="empty-state">Aucun port trouvé.</td></tr>';
+  }
+
+  if (hygActiveSub === 'processes'){
+    const rows = hygDetailData.processes.filter(p => matches(`${p.name||''} ${p.euser||''} ${p.cmd||''}`));
+    const tbody = document.querySelector('#hyg-processes-table tbody');
+    tbody.innerHTML = rows.length ? rows.map(p => `
+      <tr>
+        <td>${escapeText(p.pid)}</td>
+        <td>${escapeText(p.name)}</td>
+        <td>${escapeText(p.euser)}</td>
+        <td>${escapeText(p.cmd)}</td>
+        <td>${fmtEpoch(p.start_time)}</td>
+      </tr>`).join('') : '<tr><td colspan="5" class="empty-state">Aucun processus trouvé.</td></tr>';
+  }
+
+  if (hygActiveSub === 'hotfixes'){
+    const rows = hygDetailData.hotfixes.filter(h => matches(h.hotfix || ''));
+    const tbody = document.querySelector('#hyg-hotfixes-table tbody');
+    tbody.innerHTML = rows.length ? rows.map(h => `<tr><td>${escapeText(h.hotfix)}</td></tr>`).join('') : '<tr><td class="empty-state">Aucun correctif recensé (agent non-Windows, ou scan pas encore effectué).</td></tr>';
+  }
+}
+
+// Doit rester synchronisé avec SENSITIVE_PORTS côté src/wazuh_inventory.py (juste pour l'affichage).
+const SENSITIVE_PORTS_CLIENT = {
+  21:'FTP', 23:'Telnet', 25:'SMTP', 69:'TFTP', 111:'RPCbind', 135:'RPC', 139:'NetBIOS',
+  161:'SNMP', 162:'SNMP-trap', 389:'LDAP', 445:'SMB', 512:'rexec', 513:'rlogin', 514:'rsh',
+  1433:'MSSQL', 2049:'NFS', 3306:'MySQL', 3389:'RDP', 5432:'PostgreSQL', 5900:'VNC',
+  5985:'WinRM (HTTP)', 5986:'WinRM (HTTPS)', 6000:'X11', 6379:'Redis', 9200:'Elasticsearch',
+  11211:'Memcached', 27017:'MongoDB',
+};
+
+/* ==================== AI Agent (Gemini 3.1 Flash Lite via backend) ==================== */
+const aiPanel = document.getElementById('ai-panel');
+const aiOverlay = document.getElementById('ai-overlay');
+const aiMessages = document.getElementById('ai-messages');
+const aiInput = document.getElementById('ai-input');
+const aiSend = document.getElementById('ai-send');
+
+function openAiPanel(){ aiPanel.classList.add('active'); aiOverlay.classList.add('active'); aiInput.focus(); }
+function closeAiPanel(){ aiPanel.classList.remove('active'); aiOverlay.classList.remove('active'); }
+document.getElementById('ai-toggle').addEventListener('click', openAiPanel);
+document.getElementById('ai-close').addEventListener('click', closeAiPanel);
+aiOverlay.addEventListener('click', closeAiPanel);
+
+function appendAiMessage(role, text){
+  const div = document.createElement('div');
+  div.className = `ai-msg ${role}`;
+  div.textContent = text;
+  aiMessages.appendChild(div);
+  aiMessages.scrollTop = aiMessages.scrollHeight;
+}
+function showTyping(){
+  const div = document.createElement('div');
+  div.className = 'ai-typing';
+  div.id = 'ai-typing-indicator';
+  div.innerHTML = '<span></span><span></span><span></span>';
+  aiMessages.appendChild(div);
+  aiMessages.scrollTop = aiMessages.scrollHeight;
+}
+function hideTyping(){
+  document.getElementById('ai-typing-indicator')?.remove();
+}
+
+function buildStateSnapshot(){
+  return {
+    total: parseInt(document.getElementById('c-total').textContent) || 0,
+    true_positive: parseInt(document.getElementById('c-tp').textContent) || 0,
+    false_positive: parseInt(document.getElementById('c-fp').textContent) || 0,
+    alerts_per_min: parseFloat(document.getElementById('c-rate').textContent) || 0,
+    avg_confidence: document.getElementById('c-conf').textContent,
+    tp_rate: document.getElementById('c-tprate').textContent,
+    recent_alerts_sample: currentAlerts.slice(0, 10)
+  };
+}
+
+async function askAi(question){
+  if (!question.trim()) return;
+  appendAiMessage('user', question);
+  aiHistory.push({role:'user', text:question});
+  aiInput.value = '';
+  aiSend.disabled = true;
+  showTyping();
+  try {
+    const res = await fetch(API + '/ai/ask', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        question,
+        context: buildStateSnapshot(),
+        history: aiHistory.slice(-10)
+      })
+    });
+    hideTyping();
+    if (!res.ok) throw new Error('endpoint indisponible');
+    const data = await res.json();
+    appendAiMessage('assistant', data.answer || "Réponse vide reçue de l'agent.");
+    aiHistory.push({role:'assistant', text:data.answer || ''});
+  } catch(e){
+    hideTyping();
+    appendAiMessage('system', "Endpoint /ai/ask injoignable. Vérifie que le backend FastAPI expose bien un endpoint proxy vers Gemini 3.1 Flash Lite.");
+  }
+  aiSend.disabled = false;
+}
+aiSend.addEventListener('click', () => askAi(aiInput.value));
+aiInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); askAi(aiInput.value); }
+});
+document.querySelectorAll('.ai-chip').forEach(chip => {
+  chip.addEventListener('click', () => askAi(chip.dataset.prompt));
+});
+
+/* ==================== Palette de commandes (Ctrl/Cmd+K) ====================
+   Navigation et actions rapides façon Linear/Vercel — clavier d'abord, cohérent avec
+   l'esthétique "console" du reste du dashboard. Zéro dépendance (pas de librairie de
+   fuzzy-search : un filtrage par sous-chaîne sur libellé + mots-clés suffit largement
+   au nombre de commandes ici). */
+const CMDK_COMMANDS = [
+  {group:'Navigation', label:'Logs Wazuh — flux brut en direct', icon:'zap', keywords:'logs bruts wazuh flux tail', run: () => switchToLogsTab()},
+  {group:'Navigation', label:'Classification ML — verdicts en direct', icon:'shield', keywords:'l1 classification alertes flux triage verdicts', run: () => switchToClassificationTab()},
+  {group:'Navigation', label:'Vue avancée — statistiques & modèle', icon:'chart', keywords:'stats importance features sparkline', run: () => document.querySelector('.tab-btn[data-view="advanced"]').click()},
+  {group:'Navigation', label:'États SOC — cycle de vie & MITRE', icon:'flow', keywords:'lifecycle mitre attack tactiques', run: () => document.querySelector('.tab-btn[data-view="states"]').click()},
+  {group:'Navigation', label:'Réseau — topologie & IP à risque', icon:'network', keywords:'topologie graphe ip agents', run: () => document.querySelector('.tab-btn[data-view="network"]').click()},
+  {group:'Navigation', label:'SQL Server — sessions & permissions', icon:'database', keywords:'sql server dmv sessions utilisateurs', run: () => document.querySelector('.tab-btn[data-view="sql"]').click()},
+  {group:'Navigation', label:'Hygiène IT — score & vulnérabilités', icon:'shield', keywords:'hygiene score ports vulnerabilites agents', run: () => document.querySelector('.tab-btn[data-view="hygiene"]').click()},
+  {group:'Navigation', label:'Connexions admin — historique', icon:'clock', keywords:'auth login historique connexions', run: () => document.querySelector('.tab-btn[data-view="auth-history"]').click()},
+  {group:'Actions', label:'Basculer thème clair/sombre', icon:'sun', keywords:'theme dark light clair sombre', run: () => themeBtn.click()},
+  {group:'Actions', label:'Ouvrir l\'assistant IA', icon:'sparkle', keywords:'ai ia assistant gemini chat', run: () => openAiPanel()},
+  {group:'Actions', label:'Exporter les alertes affichées (JSON)', icon:'download', keywords:'export json telecharger', run: () => document.getElementById('btn-export').click()},
+  {group:'Actions', label:'Actualiser maintenant', icon:'refresh', keywords:'refresh actualiser reload', run: () => refreshAll()},
+  {group:'Actions', label:'Rechercher dans le flux d\'alertes', icon:'search', keywords:'recherche filtre chercher', run: () => {
+    switchToClassificationTab();
+    setTimeout(() => document.getElementById('feed-search').focus(), 50);
+  }},
+  {group:'Actions', label:'Déconnexion', icon:'logout', keywords:'logout deconnexion quitter', run: () => document.getElementById('logout-btn').click()},
+];
+
+const cmdkOverlay = document.getElementById('cmdk-overlay');
+const cmdkInput = document.getElementById('cmdk-input');
+const cmdkList = document.getElementById('cmdk-list');
+let cmdkFiltered = CMDK_COMMANDS;
+let cmdkActiveIdx = 0;
+
+function renderCmdk(){
+  const q = cmdkInput.value.trim().toLowerCase();
+  cmdkFiltered = !q ? CMDK_COMMANDS : CMDK_COMMANDS.filter(c =>
+    c.label.toLowerCase().includes(q) || c.keywords.includes(q)
+  );
+  cmdkActiveIdx = 0;
+
+  if (!cmdkFiltered.length){
+    cmdkList.innerHTML = '<div class="cmdk-empty">Aucune commande ne correspond.</div>';
+    return;
+  }
+
+  let html = '';
+  let lastGroup = null;
+  cmdkFiltered.forEach((c, i) => {
+    if (c.group !== lastGroup){
+      html += `<div class="cmdk-group">${escapeHtml(c.group)}</div>`;
+      lastGroup = c.group;
+    }
+    html += `
+      <div class="cmdk-item${i === cmdkActiveIdx ? ' active' : ''}" data-idx="${i}">
+        ${ICONS[c.icon] || ''}
+        <span>${escapeHtml(c.label)}</span>
+      </div>`;
+  });
+  cmdkList.innerHTML = html;
+
+  cmdkList.querySelectorAll('.cmdk-item').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cmdkActiveIdx = parseInt(el.dataset.idx, 10);
+      updateCmdkActive();
+    });
+    el.addEventListener('click', () => runCmdkActive());
+  });
+}
+
+function updateCmdkActive(){
+  cmdkList.querySelectorAll('.cmdk-item').forEach(el => {
+    el.classList.toggle('active', parseInt(el.dataset.idx, 10) === cmdkActiveIdx);
+  });
+  cmdkList.querySelector('.cmdk-item.active')?.scrollIntoView({block:'nearest'});
+}
+
+function runCmdkActive(){
+  const cmd = cmdkFiltered[cmdkActiveIdx];
+  if (!cmd) return;
+  closeCmdk();
+  cmd.run();
+}
+
+function openCmdk(){
+  cmdkOverlay.classList.add('active');
+  cmdkInput.value = '';
+  renderCmdk();
+  setTimeout(() => cmdkInput.focus(), 10);
+}
+function closeCmdk(){ cmdkOverlay.classList.remove('active'); }
+
+document.getElementById('palette-toggle').addEventListener('click', openCmdk);
+cmdkOverlay.addEventListener('click', (e) => { if (e.target === cmdkOverlay) closeCmdk(); });
+cmdkInput.addEventListener('input', renderCmdk);
+cmdkInput.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowDown'){ e.preventDefault(); cmdkActiveIdx = Math.min(cmdkActiveIdx + 1, cmdkFiltered.length - 1); updateCmdkActive(); }
+  else if (e.key === 'ArrowUp'){ e.preventDefault(); cmdkActiveIdx = Math.max(cmdkActiveIdx - 1, 0); updateCmdkActive(); }
+  else if (e.key === 'Enter'){ e.preventDefault(); runCmdkActive(); }
+  else if (e.key === 'Escape'){ closeCmdk(); }
+});
+document.addEventListener('keydown', (e) => {
+  const isK = e.key === 'k' || e.key === 'K';
+  if ((e.metaKey || e.ctrlKey) && isK){
+    e.preventDefault();
+    cmdkOverlay.classList.contains('active') ? closeCmdk() : openCmdk();
+  } else if (e.key === 'Escape' && cmdkOverlay.classList.contains('active')){
+    closeCmdk();
+  }
+});
+</script>
+
+</body>
+</html>
